@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Notion Custom Agents — Learning Path</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%230f172a'/%3E%3Ctext x='16' y='22' text-anchor='middle' font-size='18'%3E%F0%9F%94%A7%3C/text%3E%3C/svg%3E">
+<link rel="stylesheet" href="../shared/learning-map.css">
+<style>
+  /* Morph icon styles (inline to avoid extra file) */
+  .morph-icon {
+    position: absolute; z-index: 5; width: 28px; height: 28px; border-radius: 50%;
+    background: var(--bg-card); border: 1.5px solid #a78bfa;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer; transition: all 0.25s ease;
+    animation: morphIconAppear 0.4s ease-out backwards;
+  }
+  @keyframes morphIconAppear { from { opacity: 0; transform: scale(0.3); } to { opacity: 1; transform: scale(1); } }
+  .morph-icon::after {
+    content: ''; position: absolute; inset: -5px; border-radius: 50%;
+    border: 1.5px solid rgba(167, 139, 250, 0.35);
+    animation: morphIconRipple 2.5s ease-out infinite;
+  }
+  @keyframes morphIconRipple { 0% { transform: scale(1); opacity: 1; } 70% { transform: scale(1.5); opacity: 0; } 100% { transform: scale(1.5); opacity: 0; } }
+  .morph-icon:hover { background: rgba(167, 139, 250, 0.15); border-color: #c4b5fd; box-shadow: 0 0 14px rgba(167, 139, 250, 0.4); transform: scale(1.12); }
+  .morph-icon-text { color: #a78bfa; font-family: 'SF Mono', monospace; font-size: 9px; font-weight: 700; pointer-events: none; transition: color 0.25s; }
+  .morph-icon:hover .morph-icon-text { color: #e9d5ff; }
+
+  /* Morph modal */
+  .morph-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.75); backdrop-filter: blur(4px); z-index: 1000; display: flex; align-items: center; justify-content: center; opacity: 0; transition: opacity 0.3s; pointer-events: none; }
+  .morph-overlay--visible { opacity: 1; pointer-events: all; }
+  .morph-modal { background: var(--bg-surface); border: 1px solid rgba(167,139,250,0.2); border-radius: 16px; padding: 32px; max-width: 720px; width: 90%; max-height: 85vh; overflow-y: auto; transform: translateY(20px) scale(0.97); transition: transform 0.3s cubic-bezier(0.16,1,0.3,1); box-shadow: 0 25px 50px rgba(0,0,0,0.5); }
+  .morph-overlay--visible .morph-modal { transform: translateY(0) scale(1); }
+  .morph-modal-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px; }
+  .morph-modal-title { font-size: 1.1rem; font-weight: 600; color: var(--text-primary); display: flex; align-items: center; gap: 8px; }
+  .morph-modal-arrow { color: #a78bfa; font-size: 0.9rem; }
+  .morph-modal-close { background: none; border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; color: var(--text-secondary); width: 32px; height: 32px; font-size: 1.2rem; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s; }
+  .morph-modal-close:hover { background: rgba(255,255,255,0.05); color: var(--text-primary); }
+  .morph-block { margin-bottom: 24px; }
+  .morph-legend { font-size: 0.85rem; color: var(--text-secondary); line-height: 1.5; margin-bottom: 12px; }
+  .morph-legend code { background: rgba(167,139,250,0.12); color: #c4b5fd; padding: 1px 5px; border-radius: 3px; font-family: 'SF Mono', monospace; font-size: 0.8rem; }
+  .morph-code { position: relative; white-space: pre; background: #0d1117; border: 1px solid rgba(255,255,255,0.06); border-radius: 10px; padding: 16px 20px; font-family: 'SF Mono', monospace; font-size: 0.82rem; line-height: 1.7; overflow-x: auto; margin-bottom: 10px; color: #e2e8f0; }
+  .morph-controls { display: flex; gap: 6px; align-items: center; }
+  .morph-btn { background: rgba(167,139,250,0.08); border: 1px solid rgba(167,139,250,0.2); color: #c4b5fd; padding: 5px 14px; border-radius: 6px; font-size: 0.75rem; font-weight: 500; cursor: pointer; transition: all 0.2s; font-family: inherit; }
+  .morph-btn:hover { background: rgba(167,139,250,0.15); border-color: rgba(167,139,250,0.4); color: #e9d5ff; }
+  .morph-btn--active { background: rgba(167,139,250,0.2); border-color: #a78bfa; color: #e9d5ff; }
+  .morph-btn-play { display: inline-flex; align-items: center; gap: 6px; }
+  .morph-btn-play-icon { transition: transform 0.5s ease; flex-shrink: 0; }
+  .morph-btn-play-label { display: inline-grid; }
+  .morph-btn-play-label > span { grid-area: 1/1; transition: opacity 0.5s ease; }
+  .morph-btn-play-label-revert { opacity: 0; }
+  .morph-btn-play--after .morph-btn-play-icon { transform: rotate(-180deg); }
+  .morph-btn-play--after .morph-btn-play-label-play { opacity: 0; }
+  .morph-btn-play--after .morph-btn-play-label-revert { opacity: 1; }
+
+  /* Shiki Magic Move */
+  .shiki-magic-move-container { position: relative; white-space: pre; }
+  .shiki-magic-move-item { display: inline-block; transition: color var(--smm-duration, 0.5s) var(--smm-easing, ease); }
+  .shiki-magic-move-move { transition: all var(--smm-duration, 0.5s) var(--smm-easing, ease); z-index: 1; }
+  .shiki-magic-move-enter-active, .shiki-magic-move-leave-active { transition: all var(--smm-duration, 0.5s) var(--smm-easing, ease); }
+  .shiki-magic-move-enter-from, .shiki-magic-move-leave-to { opacity: 0; }
+  br.shiki-magic-move-leave-active { display: none; }
+
+  .branches-grid {
+    display: grid;
+    gap: 60px 80px;
+    max-width: 800px;
+    margin: 0 auto;
+    justify-items: center;
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <a href="../" class="header-back">&larr; Tous les parcours</a>
+  <h1>Notion Custom Agents</h1>
+  <p>Skill tree — survolez pour les concepts, cliquez pour les détails</p>
+  <div class="mode-toggle" id="modeToggle"></div>
+</div>
+
+<div class="legend" id="legend"></div>
+
+<div class="tree-container" id="treeContainer"></div>
+
+<div class="tooltip" id="tooltip"></div>
+
+<div class="detail-panel" id="detailPanel">
+  <button class="detail-panel-close" id="detailClose" aria-label="Fermer">&times;</button>
+  <div class="detail-inner" id="detailContent"></div>
+</div>
+
+<div class="morph-overlay" id="morphOverlay">
+  <div class="morph-modal">
+    <div class="morph-modal-header">
+      <div class="morph-modal-title" id="morphModalTitle"></div>
+      <button class="morph-modal-close" id="morphModalClose">&times;</button>
+    </div>
+    <div id="morphModalContent"></div>
+  </div>
+</div>
+
+<script src="data.js"></script>
+<script src="../shared/learning-map-engine.js"></script>
+<script>
+  LearningMap.init({
+    storageKey: 'progress-notion-agents',
+    layers: ['basics', 'triggers', 'advanced'],
+  });
+</script>
+</body>
+</html>

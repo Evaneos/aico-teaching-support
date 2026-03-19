@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Community Days 2026 — Toolkits</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%230f172a'/%3E%3Ctext x='16' y='22' text-anchor='middle' font-size='18'%3E%F0%9F%8F%8E%EF%B8%8F%3C/text%3E%3C/svg%3E">
+<style>
+  :root {
+    --bg-deep: #0a0e17;
+    --bg-surface: #111827;
+    --bg-card: #1a2332;
+    --text-primary: #e2e8f0;
+    --text-secondary: #94a3b8;
+    --text-muted: #475569;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html, body {
+    width: 100%;
+    min-height: 100vh;
+    background: var(--bg-deep);
+    color: var(--text-primary);
+    font-family: 'Avenir Next', 'Avenir', -apple-system, 'Segoe UI', sans-serif;
+  }
+
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background:
+      radial-gradient(ellipse 800px 400px at 20% 30%, rgba(52, 211, 153, 0.05), transparent),
+      radial-gradient(ellipse 600px 500px at 50% 60%, rgba(56, 189, 248, 0.04), transparent),
+      radial-gradient(ellipse 500px 400px at 80% 40%, rgba(251, 146, 60, 0.04), transparent);
+    pointer-events: none;
+  }
+
+  body::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(255,255,255,0.015) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,0.015) 1px, transparent 1px);
+    background-size: 60px 60px;
+    pointer-events: none;
+  }
+
+  .container {
+    position: relative;
+    z-index: 1;
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 80px 32px 60px;
+  }
+
+  .header {
+    text-align: center;
+    margin-bottom: 64px;
+  }
+
+  .header-badge {
+    display: inline-block;
+    font-size: 0.65rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    padding: 4px 12px;
+    border-radius: 4px;
+    background: rgba(251, 146, 60, 0.12);
+    color: #fdba74;
+    border: 1px solid rgba(251, 146, 60, 0.25);
+    margin-bottom: 20px;
+  }
+
+  .header h1 {
+    font-size: 2.4rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    background: linear-gradient(135deg, #34d399, #38bdf8, #fb923c);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    line-height: 1.2;
+  }
+
+  .header p {
+    margin-top: 12px;
+    color: var(--text-secondary);
+    font-size: 1rem;
+    max-width: 500px;
+    margin-left: auto;
+    margin-right: auto;
+    line-height: 1.6;
+  }
+
+  .cards {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+  }
+
+  @media (max-width: 768px) {
+    .cards { grid-template-columns: 1fr; }
+  }
+
+  .card {
+    position: relative;
+    background: rgba(26, 35, 50, 0.7);
+    backdrop-filter: blur(8px);
+    border: 1px solid rgba(255,255,255,0.06);
+    border-radius: 16px;
+    padding: 28px 24px;
+    text-decoration: none;
+    color: inherit;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    overflow: hidden;
+  }
+
+  .card:hover {
+    background: rgba(31, 43, 61, 0.8);
+    transform: translateY(-4px);
+    border-color: rgba(255,255,255,0.1);
+  }
+
+  .card::before {
+    content: '';
+    position: absolute;
+    inset: -1px;
+    border-radius: 16px;
+    padding: 1px;
+    background: linear-gradient(135deg, var(--card-accent), transparent 60%);
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+
+  .card:hover::before { opacity: 0.6; }
+
+  .card-icon {
+    font-size: 2rem;
+    line-height: 1;
+  }
+
+  .card-title {
+    font-size: 1.15rem;
+    font-weight: 700;
+    line-height: 1.2;
+  }
+
+  .card-desc {
+    font-size: 0.82rem;
+    color: var(--text-secondary);
+    line-height: 1.55;
+  }
+
+  .card-meta {
+    display: flex;
+    gap: 12px;
+    margin-top: auto;
+    padding-top: 8px;
+  }
+
+  .card-meta-item {
+    font-size: 0.68rem;
+    padding: 3px 8px;
+    border-radius: 4px;
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(255,255,255,0.06);
+    color: var(--text-muted);
+  }
+
+  .card-meta-item strong {
+    color: var(--text-secondary);
+    font-weight: 600;
+  }
+
+  .card-layers {
+    display: flex;
+    gap: 4px;
+  }
+
+  .card-layer-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 2px;
+  }
+
+  .card-arrow {
+    position: absolute;
+    top: 28px;
+    right: 24px;
+    font-size: 1.2rem;
+    color: var(--text-muted);
+    transition: all 0.3s;
+  }
+
+  .card:hover .card-arrow {
+    color: var(--text-secondary);
+    transform: translateX(3px);
+  }
+
+  /* Card accent colors */
+  .card--claude { --card-accent: #34d399; }
+  .card--notion { --card-accent: #38bdf8; }
+  .card--n8n { --card-accent: #fb923c; }
+</style>
+</head>
+<body>
+
+<div class="container">
+  <div class="header">
+    <div class="header-badge">PIT STOP — Community Days 2026</div>
+    <h1>Toolkits</h1>
+    <p>Trois parcours d'apprentissage interactifs. Commencez par le mode Jour J, approfondissez ensuite.</p>
+  </div>
+
+  <div class="cards">
+    <a href="claude-code/" class="card card--claude">
+      <span class="card-arrow">&rarr;</span>
+      <div class="card-icon">&#x1F527;</div>
+      <div class="card-title">Claude Code</div>
+      <div class="card-desc">
+        Installation, plugins, skills, subagents. Un coding agent qui va bien au-delà du code.
+      </div>
+      <div class="card-layers">
+        <div class="card-layer-dot" style="background:#34d399"></div>
+        <div class="card-layer-dot" style="background:#38bdf8"></div>
+        <div class="card-layer-dot" style="background:#fb923c"></div>
+      </div>
+      <div class="card-meta">
+        <div class="card-meta-item"><strong>Jour J</strong> 30 min</div>
+        <div class="card-meta-item"><strong>Complet</strong> 6 exercices</div>
+      </div>
+    </a>
+
+    <a href="notion-agents/" class="card card--notion">
+      <span class="card-arrow">&rarr;</span>
+      <div class="card-icon">&#x1F916;</div>
+      <div class="card-title">Notion Custom Agents</div>
+      <div class="card-desc">
+        Agents autonomes dans Notion. Du daily digest au bot Slack, 8 use cases progressifs.
+      </div>
+      <div class="card-layers">
+        <div class="card-layer-dot" style="background:#34d399"></div>
+        <div class="card-layer-dot" style="background:#38bdf8"></div>
+        <div class="card-layer-dot" style="background:#fb923c"></div>
+      </div>
+      <div class="card-meta">
+        <div class="card-meta-item"><strong>Jour J</strong> 15 min</div>
+        <div class="card-meta-item"><strong>Complet</strong> 8 exercices</div>
+      </div>
+    </a>
+
+    <a href="n8n/" class="card card--n8n">
+      <span class="card-arrow">&rarr;</span>
+      <div class="card-icon">&#x2699;&#xFE0F;</div>
+      <div class="card-title">n8n</div>
+      <div class="card-desc">
+        Automatisation visuelle. Workflows, webhooks, API, AI Agents — du no-code au low-code en 8 use cases.
+      </div>
+      <div class="card-layers">
+        <div class="card-layer-dot" style="background:#34d399"></div>
+        <div class="card-layer-dot" style="background:#38bdf8"></div>
+        <div class="card-layer-dot" style="background:#fb923c"></div>
+      </div>
+      <div class="card-meta">
+        <div class="card-meta-item"><strong>Jour J</strong> 15 min</div>
+        <div class="card-meta-item"><strong>Complet</strong> 8 exercices</div>
+      </div>
+    </a>
+  </div>
+</div>
+
+</body>
+</html>
