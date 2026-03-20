@@ -109,13 +109,15 @@ const LearningMap = (() => {
 
     const jourJCount = EXERCISES.filter(e => e.jourJ).length;
     const totalCount = EXERCISES.length;
+    const quickLabel = config.quickLabel || 'Jour J';
+    const fullLabel = config.fullLabel || 'Parcours complet';
 
     modeToggle.innerHTML = `
       <button class="mode-btn ${mode === 'jourJ' ? 'mode-btn--active' : ''}" data-mode="jourJ">
-        Jour J <span class="mode-badge mode-badge--jour-j">${jourJCount}</span>
+        ${quickLabel} <span class="mode-badge mode-badge--jour-j">${jourJCount}</span>
       </button>
       <button class="mode-btn ${mode === 'complete' ? 'mode-btn--active' : ''}" data-mode="complete">
-        Parcours complet <span class="mode-badge" style="background:rgba(255,255,255,0.06);color:var(--text-secondary);border:1px solid rgba(255,255,255,0.08)">${totalCount}</span>
+        ${fullLabel} <span class="mode-badge" style="background:rgba(255,255,255,0.06);color:var(--text-secondary);border:1px solid rgba(255,255,255,0.08)">${totalCount}</span>
       </button>
     `;
 

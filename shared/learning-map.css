@@ -64,6 +64,25 @@
   --ai-line: var(--agents-line);
   --ai-label: var(--agents-label);
 
+  /* Aliases for Gemini path */
+  --transition-glow: var(--basics-glow);
+  --transition-bg: var(--basics-bg);
+  --transition-border: var(--basics-border);
+  --transition-line: var(--basics-line);
+  --transition-label: var(--basics-label);
+
+  --workspace-glow: var(--skills-glow);
+  --workspace-bg: var(--skills-bg);
+  --workspace-border: var(--skills-border);
+  --workspace-line: var(--skills-line);
+  --workspace-label: var(--skills-label);
+
+  --mastery-glow: var(--agents-glow);
+  --mastery-bg: var(--agents-bg);
+  --mastery-border: var(--agents-border);
+  --mastery-line: var(--agents-line);
+  --mastery-label: var(--agents-label);
+
   --shared-glow: #a78bfa;
   --node-future-opacity: 0.35;
 }
@@ -401,6 +420,9 @@ body::after {
 .layer--advanced .layer-label { color: var(--advanced-label); background: var(--advanced-bg); backdrop-filter: blur(8px); border: 1px solid var(--advanced-border); }
 .layer--integration .layer-label { color: var(--integration-label); background: var(--integration-bg); backdrop-filter: blur(8px); border: 1px solid var(--integration-border); }
 .layer--ai .layer-label { color: var(--ai-label); background: var(--ai-bg); backdrop-filter: blur(8px); border: 1px solid var(--ai-border); }
+.layer--transition .layer-label { color: var(--transition-label); background: var(--transition-bg); backdrop-filter: blur(8px); border: 1px solid var(--transition-border); }
+.layer--workspace .layer-label { color: var(--workspace-label); background: var(--workspace-bg); backdrop-filter: blur(8px); border: 1px solid var(--workspace-border); }
+.layer--mastery .layer-label { color: var(--mastery-label); background: var(--mastery-bg); backdrop-filter: blur(8px); border: 1px solid var(--mastery-border); }
 
 .layer--basics .layer-builds-on { background: var(--basics-bg); border: 1px solid var(--basics-border); border-left: none; }
 .layer--skills .layer-builds-on { background: var(--skills-bg); border: 1px solid var(--skills-border); border-left: none; }
@@ -409,6 +431,9 @@ body::after {
 .layer--advanced .layer-builds-on { background: var(--advanced-bg); border: 1px solid var(--advanced-border); border-left: none; }
 .layer--integration .layer-builds-on { background: var(--integration-bg); border: 1px solid var(--integration-border); border-left: none; }
 .layer--ai .layer-builds-on { background: var(--ai-bg); border: 1px solid var(--ai-border); border-left: none; }
+.layer--transition .layer-builds-on { background: var(--transition-bg); border: 1px solid var(--transition-border); border-left: none; }
+.layer--workspace .layer-builds-on { background: var(--workspace-bg); border: 1px solid var(--workspace-border); border-left: none; }
+.layer--mastery .layer-builds-on { background: var(--mastery-bg); border: 1px solid var(--mastery-border); border-left: none; }
 
 /* Layer node grid — generic layout */
 .layer-nodes {
@@ -521,6 +546,9 @@ body::after {
 .layer--advanced .node-number { background: var(--advanced-bg); color: var(--advanced-label); border: 1px solid var(--advanced-border); }
 .layer--integration .node-number { background: var(--integration-bg); color: var(--integration-label); border: 1px solid var(--integration-border); }
 .layer--ai .node-number { background: var(--ai-bg); color: var(--ai-label); border: 1px solid var(--ai-border); }
+.layer--transition .node-number { background: var(--transition-bg); color: var(--transition-label); border: 1px solid var(--transition-border); }
+.layer--workspace .node-number { background: var(--workspace-bg); color: var(--workspace-label); border: 1px solid var(--workspace-border); }
+.layer--mastery .node-number { background: var(--mastery-bg); color: var(--mastery-label); border: 1px solid var(--mastery-border); }
 
 .node-status {
   width: 8px;
