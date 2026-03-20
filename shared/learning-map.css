@@ -1,23 +1,30 @@
 /* ════════════════════════════════════════════════════════════
-   LEARNING MAP ENGINE — Shared Styles
-   Generalized from langchain-learning/docs/learning-map.html
+   LEARNING MAP ENGINE — PIT STOP / Community Days R&D 2026
+   Design system: Oswald + JetBrains Mono, neon #00FF87
    ════════════════════════════════════════════════════════════ */
 
-:root {
-  --bg-deep: #0a0e17;
-  --bg-surface: #111827;
-  --bg-card: #1a2332;
-  --bg-card-hover: #1f2b3d;
-  --text-primary: #e2e8f0;
-  --text-secondary: #94a3b8;
-  --text-muted: #475569;
+@import url('https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap');
 
-  /* Layer colors — overridden per path via data-theme */
-  --basics-glow: #34d399;
-  --basics-bg: rgba(52, 211, 153, 0.08);
-  --basics-border: rgba(52, 211, 153, 0.3);
-  --basics-line: rgba(52, 211, 153, 0.45);
-  --basics-label: #6ee7b7;
+:root {
+  --bg-deep: #0D0D0D;
+  --bg-surface: #111111;
+  --bg-card: #111111;
+  --bg-card-hover: #1A1A1A;
+  --text-primary: #E0E0E0;
+  --text-secondary: #999999;
+  --text-muted: #666666;
+
+  --neon: #00FF87;
+  --neon-dim: rgba(0, 255, 135, 0.19);
+  --neon-glow: rgba(0, 255, 135, 0.09);
+  --card-border: #1E1E1E;
+
+  /* Layer colors — all use neon green with varying opacity */
+  --basics-glow: #00FF87;
+  --basics-bg: rgba(0, 255, 135, 0.06);
+  --basics-border: rgba(0, 255, 135, 0.25);
+  --basics-line: rgba(0, 255, 135, 0.4);
+  --basics-label: #00FF87;
 
   --skills-glow: #38bdf8;
   --skills-bg: rgba(56, 189, 248, 0.06);
@@ -68,7 +75,9 @@ html, body {
   min-height: 100vh;
   background: var(--bg-deep);
   color: var(--text-primary);
-  font-family: 'Avenir Next', 'Avenir', -apple-system, 'Segoe UI', sans-serif;
+  font-family: 'Oswald', sans-serif;
+  font-weight: 300;
+  line-height: 1.625;
   overflow-x: hidden;
 }
 
@@ -76,10 +85,8 @@ body::before {
   content: '';
   position: fixed;
   inset: 0;
-  background:
-    radial-gradient(ellipse 800px 400px at 30% 20%, rgba(52, 211, 153, 0.04), transparent),
-    radial-gradient(ellipse 600px 500px at 70% 50%, rgba(56, 189, 248, 0.03), transparent),
-    radial-gradient(ellipse 500px 400px at 50% 85%, rgba(251, 146, 60, 0.03), transparent);
+  background-image: radial-gradient(circle at 1px 1px, rgba(255,255,255,0.04) 1px, transparent 0);
+  background-size: 24px 24px;
   pointer-events: none;
   z-index: 0;
 }
@@ -88,10 +95,7 @@ body::after {
   content: '';
   position: fixed;
   inset: 0;
-  background-image:
-    linear-gradient(rgba(255,255,255,0.015) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255,255,255,0.015) 1px, transparent 1px);
-  background-size: 60px 60px;
+  background: radial-gradient(ellipse 600px 600px at 50% 30%, var(--neon-glow), transparent);
   pointer-events: none;
   z-index: 0;
 }
@@ -105,20 +109,33 @@ body::after {
 }
 
 .header h1 {
-  font-size: 2rem;
+  font-size: 2.4rem;
   font-weight: 700;
-  letter-spacing: -0.02em;
-  background: linear-gradient(135deg, var(--basics-glow), var(--skills-glow, var(--basics-glow)), var(--agents-glow, var(--basics-glow)));
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  color: #fff;
+}
+
+.header h1 span {
+  color: var(--neon);
 }
 
 .header p {
   margin-top: 8px;
   color: var(--text-secondary);
-  font-size: 0.95rem;
+  font-size: 0.85rem;
   letter-spacing: 0.03em;
+  font-family: 'JetBrains Mono', monospace;
+}
+
+.header-subtitle {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.7rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--neon);
+  margin-bottom: 8px;
+  opacity: 0.7;
 }
 
 .header-back {
@@ -127,12 +144,15 @@ body::after {
   gap: 6px;
   color: var(--text-muted);
   text-decoration: none;
-  font-size: 0.8rem;
+  font-size: 0.7rem;
+  font-family: 'JetBrains Mono', monospace;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
   margin-bottom: 16px;
   transition: color 0.2s;
 }
 
-.header-back:hover { color: var(--text-secondary); }
+.header-back:hover { color: var(--neon); }
 
 /* ── MODE TOGGLE (Jour J / Complet) ── */
 .mode-toggle {
@@ -153,19 +173,20 @@ body::after {
   border: none;
   background: transparent;
   color: var(--text-muted);
-  font-family: inherit;
-  font-size: 0.78rem;
-  font-weight: 600;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.7rem;
+  font-weight: 500;
   cursor: pointer;
   transition: all 0.2s;
-  letter-spacing: 0.02em;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
 }
 
 .mode-btn:hover { color: var(--text-secondary); }
 
 .mode-btn--active {
-  background: rgba(255,255,255,0.08);
-  color: var(--text-primary);
+  background: var(--neon);
+  color: #0D0D0D;
 }
 
 .mode-badge {
@@ -179,9 +200,9 @@ body::after {
 }
 
 .mode-badge--jour-j {
-  background: rgba(251, 146, 60, 0.15);
-  color: #fdba74;
-  border: 1px solid rgba(251, 146, 60, 0.25);
+  background: rgba(0, 255, 135, 0.1);
+  color: var(--neon);
+  border: 1px solid rgba(0, 255, 135, 0.25);
 }
 
 /* ── LEGEND ── */
@@ -329,6 +350,7 @@ body::after {
   display: inline-flex;
   flex-direction: column;
   gap: 6px;
+  font-family: 'Oswald', sans-serif;
   font-size: 0.7rem;
   font-weight: 600;
   letter-spacing: 0.12em;
@@ -401,10 +423,9 @@ body::after {
   position: relative;
   width: 200px;
   min-height: 100px;
-  background: rgba(26, 35, 50, 0.7);
-  backdrop-filter: blur(8px);
-  border: 1px solid rgba(255,255,255,0.06);
-  border-radius: 12px;
+  background: var(--bg-card);
+  border: 1px solid var(--card-border);
+  border-radius: 8px;
   padding: 16px;
   cursor: pointer;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
@@ -415,14 +436,16 @@ body::after {
 }
 
 .node:hover {
-  background: rgba(31, 43, 61, 0.8);
+  background: var(--bg-card-hover);
+  border-color: rgba(0, 255, 135, 0.3);
+  box-shadow: 0 0 20px var(--neon-glow);
   transform: translateY(-3px);
   z-index: 10;
 }
 
 .node--done {
-  background: rgba(26, 35, 50, 0.85);
-  border-color: rgba(255,255,255,0.1);
+  background: var(--bg-card);
+  border-color: var(--card-border);
 }
 
 .node--done::before {
@@ -457,9 +480,9 @@ body::after {
 .node--done:hover::after { opacity: 0.28; }
 
 .node--future {
-  background: rgba(26, 35, 50, 0.35);
+  background: rgba(17, 17, 17, 0.5);
   border-style: dashed;
-  border-color: rgba(255,255,255,0.04);
+  border-color: rgba(255,255,255,0.06);
 }
 
 .node--future .node-title,
@@ -481,7 +504,8 @@ body::after {
 }
 
 .node-number {
-  font-size: 0.65rem;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.6rem;
   font-weight: 700;
   letter-spacing: 0.05em;
   padding: 2px 6px;
@@ -522,16 +546,19 @@ body::after {
 }
 
 .node-title {
+  font-family: 'Oswald', sans-serif;
   font-size: 0.95rem;
   font-weight: 600;
   line-height: 1.2;
   color: var(--text-primary);
+  text-transform: uppercase;
 }
 
 .node--future .node-title { color: var(--text-secondary); }
 
 .node-concepts {
-  font-size: 0.72rem;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.65rem;
   color: var(--text-muted);
   line-height: 1.4;
 }
@@ -542,14 +569,15 @@ body::after {
   position: absolute;
   top: -8px;
   right: -8px;
-  font-size: 0.55rem;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.5rem;
   font-weight: 700;
   padding: 2px 6px;
   border-radius: 4px;
-  background: rgba(251, 146, 60, 0.2);
-  color: #fdba74;
-  border: 1px solid rgba(251, 146, 60, 0.35);
-  letter-spacing: 0.05em;
+  background: rgba(0, 255, 135, 0.15);
+  color: var(--neon);
+  border: 1px solid rgba(0, 255, 135, 0.3);
+  letter-spacing: 0.08em;
   text-transform: uppercase;
 }
 
@@ -594,8 +622,8 @@ body::after {
   bottom: 0;
   left: 0;
   right: 0;
-  background: rgba(10, 14, 23, 0.97);
-  border-top: 1px solid rgba(255,255,255,0.06);
+  background: rgba(13, 13, 13, 0.97);
+  border-top: 1px solid var(--card-border);
   padding: 0;
   z-index: 100;
   transform: translateY(100%);
@@ -683,8 +711,9 @@ body::after {
 }
 
 .detail-number {
+  font-family: 'Oswald', sans-serif;
   font-size: 1.8rem;
-  font-weight: 800;
+  font-weight: 700;
   line-height: 1;
   letter-spacing: -0.03em;
   opacity: 0.25;
@@ -700,10 +729,12 @@ body::after {
 }
 
 .detail-title {
+  font-family: 'Oswald', sans-serif;
   font-size: 1.15rem;
   font-weight: 700;
   line-height: 1.2;
   color: var(--text-primary);
+  text-transform: uppercase;
   margin: 0;
 }
 
@@ -780,7 +811,7 @@ body::after {
   border: 1px solid rgba(167, 139, 250, 0.15);
   border-radius: 4px;
   padding: 3px 8px;
-  font-family: 'SF Mono', 'Fira Code', monospace;
+  font-family: 'JetBrains Mono', monospace;
 }
 
 .detail-bridge-arrow { color: rgba(167, 139, 250, 0.4); font-size: 0.6rem; }
@@ -805,7 +836,7 @@ body::after {
 
 .detail-insight strong { color: var(--text-primary); font-style: normal; font-weight: 600; }
 .detail-insight code {
-  font-family: 'SF Mono', 'Fira Code', monospace;
+  font-family: 'JetBrains Mono', monospace;
   font-size: 0.72rem;
   background: rgba(255,255,255,0.04);
   border: 1px solid rgba(255,255,255,0.06);
@@ -887,7 +918,7 @@ body::after {
   border: 1px solid rgba(255,255,255,0.06);
   border-radius: 6px;
   padding: 6px 10px;
-  font-family: 'SF Mono', 'Fira Code', monospace;
+  font-family: 'JetBrains Mono', monospace;
   font-size: 0.72rem;
   color: var(--text-secondary);
   overflow-x: auto;
@@ -921,7 +952,7 @@ body::after {
 
 .api-tag {
   font-size: 0.72rem;
-  font-family: 'SF Mono', 'Fira Code', monospace;
+  font-family: 'JetBrains Mono', monospace;
   padding: 3px 8px;
   border-radius: 4px;
   background: rgba(255,255,255,0.03);
@@ -964,7 +995,7 @@ body::after {
 .api-inspect-back:hover { color: var(--text-secondary); }
 
 .api-inspect-name {
-  font-family: 'SF Mono', 'Fira Code', monospace;
+  font-family: 'JetBrains Mono', monospace;
   font-size: 1.05rem;
   font-weight: 700;
   color: var(--text-primary);
@@ -973,7 +1004,7 @@ body::after {
 .api-inspect-from {
   font-size: 0.68rem;
   color: var(--text-muted);
-  font-family: 'SF Mono', 'Fira Code', monospace;
+  font-family: 'JetBrains Mono', monospace;
   padding: 3px 8px;
   background: rgba(255,255,255,0.02);
   border: 1px solid rgba(255,255,255,0.05);
@@ -989,7 +1020,7 @@ body::after {
 }
 
 .api-inspect-detail code {
-  font-family: 'SF Mono', 'Fira Code', monospace;
+  font-family: 'JetBrains Mono', monospace;
   font-size: 0.73rem;
   background: rgba(255,255,255,0.04);
   border: 1px solid rgba(255,255,255,0.06);
@@ -999,7 +1030,7 @@ body::after {
 }
 
 .api-inspect-signature {
-  font-family: 'SF Mono', 'Fira Code', monospace;
+  font-family: 'JetBrains Mono', monospace;
   font-size: 0.7rem;
   color: var(--text-muted);
   background: rgba(255,255,255,0.02);
@@ -1084,7 +1115,7 @@ body::after {
   border: 1px solid rgba(255, 255, 255, 0.06);
   border-radius: 10px;
   padding: 14px 18px;
-  font-family: 'SF Mono', 'Fira Code', monospace;
+  font-family: 'JetBrains Mono', monospace;
   font-size: 0.75rem;
   line-height: 1.65;
   overflow-x: auto;

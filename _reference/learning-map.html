@@ -1,0 +1,2550 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LangChain Learning — Skill Tree</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%230f172a'/%3E%3Cdefs%3E%3CclipPath id='bottom'%3E%3Crect x='0' y='16' width='32' height='16'/%3E%3C/clipPath%3E%3C/defs%3E%3Ccircle cx='20' cy='16' r='7' fill='none' stroke='%23818cf8' stroke-width='2.8' stroke-linecap='round'/%3E%3Ccircle cx='12' cy='16' r='7' fill='none' stroke='%2334d399' stroke-width='2.8' stroke-linecap='round'/%3E%3Ccircle cx='20' cy='16' r='7' fill='none' stroke='%23818cf8' stroke-width='2.8' stroke-linecap='round' clip-path='url(%23bottom)'/%3E%3C/svg%3E">
+<style>
+  :root {
+    --bg-deep: #0a0e17;
+    --bg-surface: #111827;
+    --bg-card: #1a2332;
+    --bg-card-hover: #1f2b3d;
+    --text-primary: #e2e8f0;
+    --text-secondary: #94a3b8;
+    --text-muted: #475569;
+    --lc-glow: #34d399;
+    --lc-bg: rgba(52, 211, 153, 0.08);
+    --lc-border: rgba(52, 211, 153, 0.3);
+    --lc-line: rgba(52, 211, 153, 0.45);
+    --lc-label: #6ee7b7;
+    --lg-glow: #38bdf8;
+    --lg-bg: rgba(56, 189, 248, 0.06);
+    --lg-border: rgba(56, 189, 248, 0.25);
+    --lg-line: rgba(56, 189, 248, 0.4);
+    --lg-label: #7dd3fc;
+    --da-glow: #fb923c;
+    --da-bg: rgba(251, 146, 60, 0.06);
+    --da-border: rgba(251, 146, 60, 0.25);
+    --da-line: rgba(251, 146, 60, 0.4);
+    --da-label: #fdba74;
+    --front-glow: #f472b6;
+    --front-bg: rgba(244, 114, 182, 0.06);
+    --front-border: rgba(244, 114, 182, 0.25);
+    --front-line: rgba(244, 114, 182, 0.4);
+    --front-label: #f9a8d4;
+    --shared-glow: #a78bfa;
+    --node-future-opacity: 0.35;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html, body {
+    width: 100%;
+    min-height: 100vh;
+    background: var(--bg-deep);
+    color: var(--text-primary);
+    font-family: 'Avenir Next', 'Avenir', -apple-system, 'Segoe UI', sans-serif;
+    overflow-x: hidden;
+  }
+
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background:
+      radial-gradient(ellipse 800px 400px at 30% 20%, rgba(52, 211, 153, 0.04), transparent),
+      radial-gradient(ellipse 600px 500px at 70% 50%, rgba(56, 189, 248, 0.03), transparent),
+      radial-gradient(ellipse 500px 400px at 50% 85%, rgba(251, 146, 60, 0.03), transparent),
+      radial-gradient(ellipse 600px 400px at 60% 95%, rgba(244, 114, 182, 0.03), transparent);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  body::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(255,255,255,0.015) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,0.015) 1px, transparent 1px);
+    background-size: 60px 60px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* ── HEADER ── */
+  .header {
+    position: relative;
+    z-index: 2;
+    text-align: center;
+    padding: 48px 24px 16px;
+  }
+
+  .header h1 {
+    font-size: 2rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    background: linear-gradient(135deg, var(--lc-glow), var(--lg-glow), var(--da-glow), var(--front-glow));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .header p {
+    margin-top: 8px;
+    color: var(--text-secondary);
+    font-size: 0.95rem;
+    letter-spacing: 0.03em;
+  }
+
+  /* ── LEGEND ── */
+  .legend {
+    position: relative;
+    z-index: 10;
+    display: flex;
+    justify-content: center;
+    gap: 32px;
+    padding: 16px 24px 8px;
+    flex-wrap: wrap;
+  }
+
+  .legend-item {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+    cursor: default;
+  }
+
+  .legend-item[data-layer] {
+    cursor: help;
+    padding: 4px 10px;
+    border-radius: 6px;
+    transition: background 0.2s, color 0.2s;
+  }
+
+  .legend-item[data-layer]:hover {
+    background: rgba(255,255,255,0.04);
+    color: var(--text-primary);
+  }
+
+  .legend-tooltip {
+    position: absolute;
+    top: calc(100% + 10px);
+    left: 50%;
+    transform: translateX(-50%) translateY(-4px);
+    width: 280px;
+    background: var(--bg-surface);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 10px;
+    padding: 14px 16px;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.2s, transform 0.2s;
+    box-shadow: 0 12px 40px rgba(0,0,0,0.5);
+    z-index: 200;
+  }
+
+  .legend-item[data-layer]:hover .legend-tooltip {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0px);
+  }
+
+  .legend-tooltip-name {
+    font-size: 0.82rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: 6px;
+  }
+
+  .legend-tooltip-desc {
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+    line-height: 1.55;
+  }
+
+  .legend-tooltip-desc strong {
+    color: var(--text-primary);
+    font-weight: 600;
+  }
+
+  .legend-tooltip::after {
+    content: '';
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    border: 6px solid transparent;
+    border-bottom-color: rgba(255,255,255,0.1);
+  }
+
+  .legend-swatch {
+    width: 12px;
+    height: 12px;
+    border-radius: 3px;
+  }
+
+  .legend-line {
+    width: 28px;
+    height: 2px;
+    border-radius: 1px;
+  }
+
+  /* ── SVG ── */
+  .connections-svg {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: -1;
+    overflow: visible;
+  }
+
+  .conn-prereq {
+    fill: none;
+    stroke-width: 1.5;
+    stroke-linecap: round;
+    transition: stroke-width 0.2s, filter 0.2s;
+  }
+
+  .conn-highlight {
+    stroke-width: 2.5 !important;
+    filter: drop-shadow(0 0 3px currentColor);
+  }
+
+  /* Cross-section connections: dim by default, reveal on hover */
+  .conn-cross-section { opacity: 0.1; transition: opacity 0.3s, stroke-width 0.2s, filter 0.2s; }
+  .conn-cross-section.conn-highlight { opacity: 1; }
+  .arrow-cross-section { opacity: 0; transition: opacity 0.3s; }
+  .arrow-cross-section.conn-highlight { opacity: 1; }
+
+  .conn-arrow {
+    stroke: none;
+    stroke-width: 0;
+    animation: arrowAppear 0.3s ease-out backwards;
+  }
+
+  /* ── TREE CONTAINER ── */
+  .tree-container {
+    position: relative;
+    z-index: 2;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 40px 48px 100px;
+  }
+
+  /* ── LAYER ── */
+  .layer {
+    position: relative;
+    z-index: 1;
+    margin-bottom: 200px;
+  }
+
+  .layer:last-child {
+    margin-bottom: 0;
+  }
+
+  .layer-label {
+    position: relative;
+    z-index: 2;
+    display: inline-flex;
+    flex-direction: column;
+    gap: 6px;
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    padding: 8px 14px;
+    border-radius: 6px;
+    margin-bottom: 28px;
+  }
+
+  .layer-label-name {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .layer-tagline {
+    font-size: 0.72rem;
+    font-weight: 400;
+    letter-spacing: 0.01em;
+    text-transform: none;
+    opacity: 0.7;
+    line-height: 1.4;
+  }
+
+  .layer-builds-on {
+    position: absolute;
+    top: 50%;
+    left: 100%;
+    transform: translateY(-50%);
+    font-size: 0.62rem;
+    font-weight: 500;
+    letter-spacing: 0.02em;
+    text-transform: none;
+    font-style: italic;
+    white-space: nowrap;
+    pointer-events: none;
+    padding: 6px 12px 6px 10px;
+    line-height: 1.45;
+    border-radius: 0 6px 6px 0;
+    opacity: 0.7;
+  }
+
+  .layer--lc .layer-builds-on { background: rgba(52, 211, 153, 0.06); border: 1px solid var(--lc-border); border-left: none; }
+  .layer--lg .layer-builds-on { background: rgba(56, 189, 248, 0.05); border: 1px solid var(--lg-border); border-left: none; }
+  .layer--da .layer-builds-on { background: rgba(251, 146, 60, 0.05); border: 1px solid var(--da-border); border-left: none; }
+  .layer--front .layer-builds-on { background: rgba(244, 114, 182, 0.05); border: 1px solid var(--front-border); border-left: none; }
+
+  .layer--lc .layer-label { color: var(--lc-label); background: rgba(52, 211, 153, 0.06); backdrop-filter: blur(8px); border: 1px solid var(--lc-border); }
+  .layer--lg .layer-label { color: var(--lg-label); background: rgba(56, 189, 248, 0.05); backdrop-filter: blur(8px); border: 1px solid var(--lg-border); }
+  .layer--da .layer-label { color: var(--da-label); background: rgba(251, 146, 60, 0.05); backdrop-filter: blur(8px); border: 1px solid var(--da-border); }
+  .layer--front .layer-label { color: var(--front-label); background: rgba(244, 114, 182, 0.05); backdrop-filter: blur(8px); border: 1px solid var(--front-border); }
+
+  /* LangChain: 2x2 grid — gives room for diagonal connections */
+  .layer--lc .layer-nodes {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 56px 160px;
+    max-width: 600px;
+    margin: 0 auto;
+  }
+
+  /* LangGraph: single row of 4 */
+  .layer--lg .layer-nodes {
+    display: flex;
+    justify-content: center;
+    gap: 48px;
+  }
+
+  /* DeepAgents: centered pair */
+  .layer--da .layer-nodes {
+    display: flex;
+    justify-content: center;
+    gap: 140px;
+  }
+
+  /* Vercel AI SDK: row of 3 */
+  .layer--front .layer-nodes {
+    display: flex;
+    justify-content: center;
+    gap: 48px;
+  }
+
+  /* ── NODE ── */
+  .node {
+    position: relative;
+    width: 200px;
+    min-height: 100px;
+    background: rgba(26, 35, 50, 0.7);
+    backdrop-filter: blur(8px);
+    border: 1px solid rgba(255,255,255,0.06);
+    border-radius: 12px;
+    padding: 16px;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    z-index: 2;
+  }
+
+  .node:hover {
+    background: rgba(31, 43, 61, 0.8);
+    transform: translateY(-3px);
+    z-index: 10;
+  }
+
+  .node--done {
+    background: rgba(26, 35, 50, 0.85);
+    border-color: rgba(255,255,255,0.1);
+  }
+
+  .node--done::before {
+    content: '';
+    position: absolute;
+    inset: -1px;
+    border-radius: 12px;
+    padding: 1px;
+    background: linear-gradient(135deg, var(--glow-color), transparent 60%);
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    pointer-events: none;
+    opacity: 0.6;
+    transition: opacity 0.3s;
+  }
+
+  .node--done:hover::before { opacity: 1; }
+
+  .node--done::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 12px;
+    box-shadow: 0 0 30px -5px var(--glow-color);
+    opacity: 0.12;
+    pointer-events: none;
+    transition: opacity 0.3s;
+  }
+
+  .node--done:hover::after { opacity: 0.28; }
+
+  .node--future {
+    background: rgba(26, 35, 50, 0.35);
+    border-style: dashed;
+    border-color: rgba(255,255,255,0.04);
+  }
+
+  .node--future .node-title,
+  .node--future .node-tags,
+  .node--future .node-number { opacity: 0.45; }
+
+  .node--future:hover {
+    background: rgba(26, 35, 50, 0.55);
+  }
+
+  .node--future:hover .node-title,
+  .node--future:hover .node-tags,
+  .node--future:hover .node-number { opacity: 0.75; }
+
+  .node-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .node-number {
+    font-size: 0.65rem;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    padding: 2px 6px;
+    border-radius: 4px;
+    flex-shrink: 0;
+  }
+
+  .layer--lc .node-number { background: var(--lc-bg); color: var(--lc-label); border: 1px solid var(--lc-border); }
+  .layer--lg .node-number { background: var(--lg-bg); color: var(--lg-label); border: 1px solid var(--lg-border); }
+  .layer--da .node-number { background: var(--da-bg); color: var(--da-label); border: 1px solid var(--da-border); }
+  .layer--front .node-number { background: var(--front-bg); color: var(--front-label); border: 1px solid var(--front-border); }
+
+  .node-status {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    margin-left: auto;
+  }
+
+  .node-status--done {
+    background: var(--glow-color);
+    box-shadow: 0 0 8px var(--glow-color);
+  }
+
+  .node-status--future {
+    border: 1.5px solid var(--text-muted);
+    background: transparent;
+  }
+
+  .node-title {
+    font-size: 0.95rem;
+    font-weight: 600;
+    line-height: 1.2;
+    color: var(--text-primary);
+  }
+
+  .node--future .node-title { color: var(--text-secondary); }
+
+  .node-concepts {
+    font-size: 0.72rem;
+    color: var(--text-muted);
+    line-height: 1.4;
+  }
+
+  .node--done .node-concepts { color: var(--text-secondary); }
+
+  /* ── TOOLTIP ── */
+  .tooltip {
+    position: fixed;
+    z-index: 200;
+    background: var(--bg-surface);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 8px;
+    padding: 12px 16px;
+    pointer-events: none;
+    opacity: 0;
+    transform: translateY(6px);
+    transition: opacity 0.2s, transform 0.2s;
+    max-width: 320px;
+    box-shadow: 0 12px 40px rgba(0,0,0,0.5);
+  }
+
+  .tooltip--visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .tooltip-apis-label {
+    font-size: 0.65rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--text-muted);
+    margin-bottom: 6px;
+  }
+
+  .tooltip-apis {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+  }
+
+  /* ── DETAIL PANEL ── */
+  .detail-panel {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: rgba(10, 14, 23, 0.97);
+    border-top: 1px solid rgba(255,255,255,0.06);
+    padding: 0;
+    z-index: 100;
+    transform: translateY(100%);
+    transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    height: fit-content;
+    max-height: 65vh;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    backdrop-filter: blur(24px);
+  }
+
+  .detail-panel--visible { transform: translateY(0); }
+
+  /* Animated top border glow — color set via JS inline style */
+  .detail-panel::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: var(--panel-accent, rgba(255,255,255,0.1));
+    opacity: 0.7;
+  }
+
+  .detail-panel::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 80px;
+    background: linear-gradient(to bottom, var(--panel-accent-bg, transparent), transparent);
+    pointer-events: none;
+    opacity: 0.5;
+  }
+
+  .detail-inner {
+    position: relative;
+    display: grid;
+    grid-template-columns: 2fr 1px 3fr;
+    gap: 0 32px;
+    padding: 24px 40px 28px;
+    max-width: 1280px;
+    margin: 0 auto;
+    min-height: 100%;
+  }
+
+  .detail-divider {
+    background: rgba(255,255,255,0.06);
+    align-self: stretch;
+  }
+
+  .detail-panel-close {
+    position: absolute;
+    top: 16px;
+    right: 24px;
+    background: none;
+    border: 1px solid rgba(255,255,255,0.08);
+    color: var(--text-muted);
+    width: 26px;
+    height: 26px;
+    border-radius: 6px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.9rem;
+    transition: all 0.2s;
+    z-index: 10;
+  }
+
+  .detail-panel-close:hover {
+    background: rgba(255,255,255,0.05);
+    color: var(--text-primary);
+    border-color: rgba(255,255,255,0.15);
+  }
+
+  /* Left column: identity */
+  .detail-left { display: flex; flex-direction: column; gap: 16px; }
+
+  .detail-header {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+  }
+
+  .detail-number {
+    font-size: 1.8rem;
+    font-weight: 800;
+    line-height: 1;
+    letter-spacing: -0.03em;
+    font-family: 'Avenir Next', 'Avenir', -apple-system, sans-serif;
+    opacity: 0.25;
+    flex-shrink: 0;
+    min-width: 48px;
+  }
+
+  .detail-title-group {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding-top: 2px;
+  }
+
+  .detail-title {
+    font-size: 1.15rem;
+    font-weight: 700;
+    line-height: 1.2;
+    color: var(--text-primary);
+    margin: 0;
+  }
+
+  .detail-meta {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .detail-layer-badge {
+    font-size: 0.6rem;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 2px 8px;
+    border-radius: 3px;
+  }
+
+  .detail-status-badge {
+    font-size: 0.65rem;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    padding: 2px 8px;
+    border-radius: 3px;
+  }
+
+  .detail-status-badge--done {
+    background: rgba(52, 211, 153, 0.12);
+    color: #6ee7b7;
+    border: 1px solid rgba(52, 211, 153, 0.2);
+  }
+
+  .detail-status-badge--future {
+    background: rgba(255,255,255,0.03);
+    color: var(--text-muted);
+    border: 1px solid rgba(255,255,255,0.06);
+  }
+
+  /* Progress dots — mini map of all exercises */
+  .detail-progress {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    padding: 8px 0 0;
+  }
+
+  .detail-progress-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 2px;
+    transition: all 0.2s;
+  }
+
+  .detail-progress-dot--done {
+    background: rgba(255,255,255,0.15);
+  }
+
+  .detail-progress-dot--future {
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.06);
+  }
+
+  .detail-progress-dot--current {
+    transform: scaleY(1.6);
+    border-radius: 2px;
+  }
+
+  /* Shared concepts — shown as inline bridge markers */
+  .detail-bridges {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    padding-top: 2px;
+  }
+
+  .detail-bridge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 0.7rem;
+    color: var(--shared-glow);
+    background: rgba(167, 139, 250, 0.06);
+    border: 1px solid rgba(167, 139, 250, 0.15);
+    border-radius: 4px;
+    padding: 3px 8px;
+    font-family: 'SF Mono', 'Fira Code', 'Cascadia Code', monospace;
+  }
+
+  .detail-bridge-arrow {
+    color: rgba(167, 139, 250, 0.4);
+    font-size: 0.6rem;
+  }
+
+  .detail-bridge-target {
+    font-weight: 700;
+    font-size: 0.6rem;
+    opacity: 0.7;
+  }
+
+  /* Key insights — aha moments */
+  .detail-insights {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding-top: 2px;
+  }
+
+  .detail-insight {
+    font-size: 0.78rem;
+    color: var(--text-secondary);
+    line-height: 1.55;
+    padding: 7px 0 7px 12px;
+    border-left: 2px solid var(--panel-accent, rgba(255,255,255,0.15));
+    font-style: italic;
+    transition: border-color 0.3s;
+  }
+
+  .detail-insight strong {
+    color: var(--text-primary);
+    font-style: normal;
+    font-weight: 600;
+  }
+
+  .detail-insight code {
+    font-family: 'SF Mono', 'Fira Code', 'Cascadia Code', monospace;
+    font-size: 0.72rem;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.06);
+    padding: 1px 5px;
+    border-radius: 3px;
+    color: var(--text-primary);
+    font-style: normal;
+  }
+
+  /* Right column: technical details */
+  .detail-right { display: flex; flex-direction: column; gap: 14px; }
+
+  .detail-section { margin: 0; }
+
+  .detail-section-label {
+    font-size: 0.6rem;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--text-muted);
+    margin-bottom: 6px;
+    font-weight: 600;
+  }
+
+  .detail-apis {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+  }
+
+  .api-tag {
+    font-size: 0.72rem;
+    font-family: 'SF Mono', 'Fira Code', 'Cascadia Code', 'JetBrains Mono', monospace;
+    padding: 3px 8px;
+    border-radius: 4px;
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(255,255,255,0.07);
+    color: var(--text-secondary);
+    transition: all 0.15s;
+    cursor: pointer;
+  }
+
+  .api-tag:hover {
+    background: rgba(255,255,255,0.06);
+    border-color: rgba(255,255,255,0.12);
+    color: var(--text-primary);
+  }
+
+  .api-tag--active {
+    background: rgba(255,255,255,0.08) !important;
+    border-color: rgba(255,255,255,0.2) !important;
+    color: var(--text-primary) !important;
+  }
+
+  /* ── API INSPECT VIEW (replaces right column on click) ── */
+  .api-inspect {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .api-inspect-back {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 0.68rem;
+    color: var(--text-muted);
+    cursor: pointer;
+    border: none;
+    background: none;
+    padding: 0;
+    font-family: inherit;
+    transition: color 0.15s;
+    align-self: flex-start;
+  }
+
+  .api-inspect-back:hover { color: var(--text-secondary); }
+
+  .api-inspect-name {
+    font-family: 'SF Mono', 'Fira Code', 'Cascadia Code', monospace;
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    line-height: 1.2;
+  }
+
+  .api-inspect-from {
+    font-size: 0.68rem;
+    color: var(--text-muted);
+    font-family: 'SF Mono', 'Fira Code', 'Cascadia Code', monospace;
+    padding: 3px 8px;
+    background: rgba(255,255,255,0.02);
+    border: 1px solid rgba(255,255,255,0.05);
+    border-radius: 4px;
+    display: inline-block;
+    align-self: flex-start;
+  }
+
+  .api-inspect-detail {
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+    line-height: 1.65;
+    font-family: 'Avenir Next', 'Avenir', -apple-system, sans-serif;
+  }
+
+  .api-inspect-detail code {
+    font-family: 'SF Mono', 'Fira Code', 'Cascadia Code', monospace;
+    font-size: 0.73rem;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.06);
+    padding: 1px 5px;
+    border-radius: 3px;
+    color: var(--text-primary);
+  }
+
+  .api-inspect-signature {
+    font-family: 'SF Mono', 'Fira Code', 'Cascadia Code', monospace;
+    font-size: 0.7rem;
+    color: var(--text-muted);
+    background: rgba(255,255,255,0.02);
+    border: 1px solid rgba(255,255,255,0.05);
+    border-radius: 5px;
+    padding: 8px 12px;
+    line-height: 1.5;
+    white-space: pre-wrap;
+    overflow-x: auto;
+  }
+
+  .detail-prereqs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+
+  .detail-prereq-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.72rem;
+    padding: 4px 10px;
+    border-radius: 5px;
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(255,255,255,0.07);
+    color: var(--text-secondary);
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+
+  .detail-prereq-chip:hover {
+    background: rgba(255,255,255,0.06);
+    border-color: rgba(255,255,255,0.15);
+    color: var(--text-primary);
+  }
+
+  .detail-prereq-num {
+    font-weight: 700;
+    font-size: 0.6rem;
+    letter-spacing: 0.04em;
+    opacity: 0.5;
+  }
+
+  /* Future exercise: locked state */
+  .detail-locked-msg {
+    font-size: 0.82rem;
+    color: var(--text-muted);
+    line-height: 1.6;
+    padding: 4px 0;
+  }
+
+  .detail-locked-msg strong {
+    color: var(--text-secondary);
+    font-weight: 600;
+  }
+
+  /* Entrance stagger for detail content */
+  @keyframes detailFadeUp {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .detail-left, .detail-right {
+    animation: detailFadeUp 0.35s cubic-bezier(0.16, 1, 0.3, 1) backwards;
+  }
+
+  .detail-right { animation-delay: 0.06s; }
+
+  /* ── DETAIL CODE SNIPPET ── */
+  .detail-code-section { margin-top: auto; flex: 1; display: flex; flex-direction: column; }
+
+  .detail-code {
+    position: relative;
+    white-space: pre;
+    background: #0d1117;
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    border-radius: 10px;
+    padding: 14px 18px;
+    font-family: 'SF Mono', 'Fira Code', 'Cascadia Code', monospace;
+    font-size: 0.75rem;
+    line-height: 1.65;
+    overflow-x: auto;
+    color: #e2e8f0;
+    flex: 1;
+    overflow-y: auto;
+  }
+
+  .detail-code .shiki-magic-move-container {
+    font-family: 'SF Mono', 'Fira Code', 'Cascadia Code', monospace;
+    font-size: 0.75rem;
+    line-height: 1.65;
+  }
+
+  /* ── ENTRANCE ANIMATION ── */
+  @keyframes nodeAppear {
+    from { opacity: 0; transform: translateY(16px) scale(0.97); }
+    to { opacity: 1; transform: translateY(0) scale(1); }
+  }
+
+  .node { animation: nodeAppear 0.5s cubic-bezier(0.4, 0, 0.2, 1) backwards; }
+
+  @keyframes drawLine {
+    from { stroke-dashoffset: var(--line-len); }
+    to { stroke-dashoffset: 0; }
+  }
+
+  .conn-prereq {
+    animation: drawLine 0.5s ease-out backwards;
+  }
+
+  @keyframes arrowAppear {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+
+  /* ── MORPH ICON (absolutely positioned in container, above nodes) ── */
+  .morph-icon {
+    position: absolute;
+    z-index: 5;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: var(--bg-card);
+    border: 1.5px solid #a78bfa;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.25s ease;
+    animation: morphIconAppear 0.4s ease-out backwards;
+  }
+
+  @keyframes morphIconAppear {
+    from { opacity: 0; transform: scale(0.3); }
+    to { opacity: 1; transform: scale(1); }
+  }
+
+  .morph-icon::after {
+    content: '';
+    position: absolute;
+    inset: -5px;
+    border-radius: 50%;
+    border: 1.5px solid rgba(167, 139, 250, 0.35);
+    animation: morphIconRipple 2.5s ease-out infinite;
+  }
+
+  @keyframes morphIconRipple {
+    0% { transform: scale(1); opacity: 1; }
+    70% { transform: scale(1.5); opacity: 0; }
+    100% { transform: scale(1.5); opacity: 0; }
+  }
+
+  .morph-icon:hover {
+    background: rgba(167, 139, 250, 0.15);
+    border-color: #c4b5fd;
+    box-shadow: 0 0 14px rgba(167, 139, 250, 0.4);
+    transform: scale(1.12);
+  }
+
+  .morph-icon-text {
+    color: #a78bfa;
+    font-family: 'SF Mono', 'Fira Code', monospace;
+    font-size: 9px;
+    font-weight: 700;
+    line-height: 1;
+    pointer-events: none;
+    transition: color 0.25s;
+  }
+
+  .morph-icon:hover .morph-icon-text {
+    color: #e9d5ff;
+  }
+
+  /* ── MORPH MODAL ── */
+  .morph-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.75);
+    backdrop-filter: blur(4px);
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    pointer-events: none;
+  }
+
+  .morph-overlay--visible {
+    opacity: 1;
+    pointer-events: all;
+  }
+
+  .morph-modal {
+    background: var(--bg-surface);
+    border: 1px solid rgba(167, 139, 250, 0.2);
+    border-radius: 16px;
+    padding: 32px;
+    max-width: 720px;
+    width: 90%;
+    max-height: 85vh;
+    overflow-y: auto;
+    transform: translateY(20px) scale(0.97);
+    transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5), 0 0 40px rgba(167, 139, 250, 0.08);
+  }
+
+  .morph-overlay--visible .morph-modal {
+    transform: translateY(0) scale(1);
+  }
+
+  .morph-modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 24px;
+  }
+
+  .morph-modal-title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .morph-modal-arrow {
+    color: #a78bfa;
+    font-size: 0.9rem;
+  }
+
+  .morph-modal-close {
+    background: none;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    color: var(--text-secondary);
+    width: 32px;
+    height: 32px;
+    font-size: 1.2rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+  }
+
+  .morph-modal-close:hover {
+    background: rgba(255, 255, 255, 0.05);
+    color: var(--text-primary);
+  }
+
+  /* ── MORPH BLOCK ── */
+  .morph-block {
+    margin-bottom: 24px;
+  }
+
+  .morph-block:last-child {
+    margin-bottom: 0;
+  }
+
+  .morph-legend {
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    line-height: 1.5;
+    margin-bottom: 12px;
+  }
+
+  .morph-legend code {
+    background: rgba(167, 139, 250, 0.12);
+    color: #c4b5fd;
+    padding: 1px 5px;
+    border-radius: 3px;
+    font-family: 'SF Mono', 'Fira Code', monospace;
+    font-size: 0.8rem;
+  }
+
+  .morph-code {
+    position: relative;
+    white-space: pre;
+    background: #0d1117;
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    border-radius: 10px;
+    padding: 16px 20px;
+    font-family: 'SF Mono', 'Fira Code', 'Cascadia Code', monospace;
+    font-size: 0.82rem;
+    line-height: 1.7;
+    overflow-x: auto;
+    margin-bottom: 10px;
+    color: #e2e8f0;
+  }
+
+  /* Shiki Magic Move — inlined to avoid CDN race condition */
+  .shiki-magic-move-container { position: relative; white-space: pre; }
+  .shiki-magic-move-line-number { opacity: 0.3; user-select: none; }
+  .shiki-magic-move-item { display: inline-block; transition: color var(--smm-duration, 0.5s) var(--smm-easing, ease); }
+  .shiki-magic-move-move { transition: all var(--smm-duration, 0.5s) var(--smm-easing, ease); transition-delay: calc(calc(var(--smm-duration, 0.5s) * var(--smm-delay-move, 1)) + var(--smm-stagger, 0)); z-index: 1; }
+  .shiki-magic-move-enter-active, .shiki-magic-move-leave-active { transition: all var(--smm-duration, 0.5s) var(--smm-easing, ease); }
+  .shiki-magic-move-enter-active { transition-delay: calc(calc(var(--smm-duration, 0.5s) * var(--smm-delay-enter, 1)) + var(--smm-stagger, 0)); z-index: 1; }
+  .shiki-magic-move-leave-active { transition-delay: calc(calc(var(--smm-duration, 0.5s) * var(--smm-delay-leave, 1)) + var(--smm-stagger, 0)); }
+  .shiki-magic-move-container-resize, .shiki-magic-move-container-restyle { transition: all var(--smm-duration, 0.5s) var(--smm-easing, ease); transition-delay: calc(var(--smm-duration, 0.5s) * var(--smm-delay-container, 1)); }
+  .shiki-magic-move-enter-from, .shiki-magic-move-leave-to { opacity: 0; }
+  br.shiki-magic-move-leave-active { display: none; }
+
+  .morph-code .shiki-magic-move-container {
+    font-family: 'SF Mono', 'Fira Code', 'Cascadia Code', monospace;
+    font-size: 0.82rem;
+    line-height: 1.7;
+  }
+
+  /* ── MORPH CONTROLS ── */
+  .morph-controls {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+  }
+
+  .morph-btn {
+    background: rgba(167, 139, 250, 0.08);
+    border: 1px solid rgba(167, 139, 250, 0.2);
+    color: #c4b5fd;
+    padding: 5px 14px;
+    border-radius: 6px;
+    font-size: 0.75rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-family: inherit;
+  }
+
+  .morph-btn:hover {
+    background: rgba(167, 139, 250, 0.15);
+    border-color: rgba(167, 139, 250, 0.4);
+    color: #e9d5ff;
+  }
+
+  .morph-btn--active {
+    background: rgba(167, 139, 250, 0.2);
+    border-color: #a78bfa;
+    color: #e9d5ff;
+  }
+
+  .morph-btn-play {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .morph-btn-play-icon {
+    transition: transform 0.5s ease;
+    flex-shrink: 0;
+  }
+
+  .morph-btn-play-label {
+    display: inline-grid;
+  }
+
+  .morph-btn-play-label > span {
+    grid-area: 1 / 1;
+    transition: opacity 0.5s ease;
+  }
+
+  .morph-btn-play-label-revert {
+    opacity: 0;
+  }
+
+  .morph-btn-play--after .morph-btn-play-icon {
+    transform: rotate(-180deg);
+  }
+
+  .morph-btn-play--after .morph-btn-play-label-play {
+    opacity: 0;
+  }
+
+  .morph-btn-play--after .morph-btn-play-label-revert {
+    opacity: 1;
+  }
+
+  /* ── RESPONSIVE ── */
+  /* ── BRANCHES SECTION (09-13) ── */
+  .branches-section {
+    position: relative;
+    z-index: 2;
+    margin-top: 60px;
+    padding-top: 32px;
+  }
+
+  .branches-section::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: min(80%, 500px);
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.08), transparent);
+  }
+
+  .branches-section-label {
+    text-align: center;
+    font-size: 0.72rem;
+    font-weight: 500;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-bottom: 40px;
+  }
+
+  .branches-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    grid-template-rows: auto auto;
+    gap: 60px 80px;
+    max-width: 800px;
+    margin: 0 auto;
+    justify-items: center;
+  }
+
+  /* Grid positions for branch nodes */
+  .branches-grid .node[data-id="09"] { grid-column: 1; grid-row: 1; }
+  .branches-grid .node[data-id="11"] { grid-column: 2; grid-row: 1; }
+  .branches-grid .node[data-id="12"] { grid-column: 3; grid-row: 1; }
+  .branches-grid .node[data-id="10"] { grid-column: 1; grid-row: 2; }
+  .branches-grid .node[data-id="13"] { grid-column: 2; grid-row: 2; }
+
+  /* data-layer selectors — work in BOTH trunk and branches sections */
+  .node[data-layer="lc"] .node-number { background: var(--lc-bg); color: var(--lc-label); border: 1px solid var(--lc-border); }
+  .node[data-layer="lg"] .node-number { background: var(--lg-bg); color: var(--lg-label); border: 1px solid var(--lg-border); }
+  .node[data-layer="da"] .node-number { background: var(--da-bg); color: var(--da-label); border: 1px solid var(--da-border); }
+  .node[data-layer="front"] .node-number { background: var(--front-bg); color: var(--front-label); border: 1px solid var(--front-border); }
+
+  @media (max-width: 900px) {
+    .layer--lc .layer-nodes { max-width: 440px; gap: 40px 80px; }
+    .layer--lg .layer-nodes { flex-wrap: wrap; gap: 24px; }
+    .node { width: 160px; min-height: 85px; }
+    .header h1 { font-size: 1.5rem; }
+    .branches-grid {
+      grid-template-columns: 1fr;
+      gap: 40px;
+    }
+    .branches-grid .node[data-id="09"],
+    .branches-grid .node[data-id="10"],
+    .branches-grid .node[data-id="11"],
+    .branches-grid .node[data-id="12"],
+    .branches-grid .node[data-id="13"] {
+      grid-column: 1;
+      grid-row: auto;
+    }
+  }
+
+  /* ── ECOSYSTEM BUTTON ── */
+  .ecosystem-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 10px;
+    padding: 6px 16px;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 8px;
+    color: var(--text-secondary);
+    font-size: 0.78rem;
+    cursor: pointer;
+    transition: background 0.2s, color 0.2s;
+  }
+
+  .ecosystem-btn:hover {
+    background: rgba(255,255,255,0.08);
+    color: var(--text-primary);
+  }
+
+  /* ── ECOSYSTEM PANEL ── */
+  .eco-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 500;
+    background: rgba(0,0,0,0.6);
+    backdrop-filter: blur(4px);
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    padding: 48px 24px;
+    overflow-y: auto;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.25s;
+  }
+
+  .eco-overlay--visible {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  .eco-modal {
+    width: 100%;
+    max-width: 780px;
+    background: var(--bg-surface);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 14px;
+    padding: 32px 36px;
+    transform: translateY(12px);
+    transition: transform 0.25s;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+  }
+
+  .eco-overlay--visible .eco-modal {
+    transform: translateY(0);
+  }
+
+  .eco-modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+  }
+
+  .eco-modal-title {
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: var(--text-primary);
+  }
+
+  .eco-modal-close {
+    background: none;
+    border: none;
+    color: var(--text-muted);
+    font-size: 1.5rem;
+    cursor: pointer;
+    padding: 4px 8px;
+    border-radius: 6px;
+  }
+
+  .eco-modal-close:hover {
+    background: rgba(255,255,255,0.06);
+    color: var(--text-primary);
+  }
+
+  .eco-section { margin-bottom: 28px; }
+  .eco-section:last-child { margin-bottom: 0; }
+
+  .eco-section h3 {
+    font-size: 0.88rem;
+    font-weight: 700;
+    margin-bottom: 8px;
+  }
+
+  .eco-section p, .eco-section li {
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+    line-height: 1.65;
+  }
+
+  .eco-section ul {
+    padding-left: 18px;
+    margin: 6px 0;
+  }
+
+  .eco-section code {
+    font-size: 0.75rem;
+    background: rgba(255,255,255,0.06);
+    padding: 2px 5px;
+    border-radius: 4px;
+    color: var(--text-primary);
+  }
+
+  .eco-section strong {
+    color: var(--text-primary);
+    font-weight: 600;
+  }
+
+  .eco-diagram {
+    background: rgba(0,0,0,0.3);
+    border-radius: 8px;
+    padding: 16px 20px;
+    font-family: 'SF Mono', 'Fira Code', monospace;
+    font-size: 0.72rem;
+    line-height: 1.5;
+    color: var(--text-secondary);
+    overflow-x: auto;
+    white-space: pre;
+    margin: 10px 0;
+  }
+
+  /* ── Stack diagram ── */
+  .eco-stack {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    margin: 12px 0;
+  }
+
+  .eco-stack-row {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    padding: 10px 16px;
+    border-radius: 6px;
+    font-size: 0.78rem;
+    color: var(--text-secondary);
+  }
+
+  .eco-stack-row span { line-height: 1.4; }
+
+  .eco-stack-app {
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.08);
+    color: var(--text-primary);
+    font-weight: 600;
+    font-size: 0.8rem;
+  }
+
+  .eco-stack-split {
+    display: flex;
+    gap: 2px;
+  }
+
+  .eco-stack-left {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .eco-stack-right {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    padding: 10px 16px;
+    border-radius: 6px;
+    font-size: 0.78rem;
+    color: var(--text-secondary);
+  }
+
+  .eco-stack-da { background: rgba(251, 146, 60, 0.08); border-left: 3px solid var(--da-glow); }
+  .eco-stack-lg { background: rgba(56, 189, 248, 0.06); border-left: 3px solid var(--lg-glow); }
+  .eco-stack-lc { background: rgba(52, 211, 153, 0.06); border-left: 3px solid var(--lc-glow); }
+  .eco-stack-front { background: rgba(244, 114, 182, 0.06); border-left: 3px solid var(--front-glow); }
+
+  .eco-stack-base {
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(255,255,255,0.06);
+    font-size: 0.75rem;
+  }
+
+  .eco-stack-obs {
+    padding: 8px 16px;
+    font-size: 0.72rem;
+    color: var(--text-muted);
+    text-align: center;
+  }
+
+  .eco-stack-obs strong {
+    color: var(--text-secondary);
+    font-weight: 600;
+  }
+
+  .eco-packages {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.78rem;
+    margin: 10px 0;
+  }
+
+  .eco-packages th {
+    text-align: left;
+    font-weight: 600;
+    color: var(--text-primary);
+    padding: 6px 10px;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+  }
+
+  .eco-packages td {
+    padding: 5px 10px;
+    color: var(--text-secondary);
+    border-bottom: 1px solid rgba(255,255,255,0.04);
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>LangChain Learning Path</h1>
+  <p>Skill tree — hover for APIs, click for details</p>
+  <button class="ecosystem-btn" id="ecoBtn">&#9776; Ecosystem glossary</button>
+</div>
+
+<div class="legend" id="legend"></div>
+
+<div class="tree-container" id="treeContainer"></div>
+
+<div class="tooltip" id="tooltip"></div>
+
+<div class="detail-panel" id="detailPanel">
+  <button class="detail-panel-close" id="detailClose" aria-label="Close">&times;</button>
+  <div class="detail-inner" id="detailContent"></div>
+</div>
+
+<div class="morph-overlay" id="morphOverlay">
+  <div class="morph-modal">
+    <div class="morph-modal-header">
+      <div class="morph-modal-title" id="morphModalTitle"></div>
+      <button class="morph-modal-close" id="morphModalClose">&times;</button>
+    </div>
+    <div id="morphModalContent"></div>
+  </div>
+</div>
+
+<div class="eco-overlay" id="ecoOverlay">
+  <div class="eco-modal">
+    <div class="eco-modal-header">
+      <div class="eco-modal-title">The AI Agent Ecosystem</div>
+      <button class="eco-modal-close" id="ecoClose">&times;</button>
+    </div>
+
+    <div class="eco-section">
+      <h3>The layers</h3>
+      <div class="eco-stack">
+        <div class="eco-stack-row eco-stack-app">
+          <span>Your App</span>
+        </div>
+        <div class="eco-stack-split">
+          <div class="eco-stack-left">
+            <div class="eco-stack-row eco-stack-da">
+              <strong style="color: var(--da-label)">DeepAgents</strong>
+              <span>Harness — predefined tools, prompts, subagents</span>
+            </div>
+            <div class="eco-stack-row eco-stack-lg">
+              <strong style="color: var(--lg-label)">LangGraph</strong>
+              <span>Runtime — durable execution, streaming, HITL, persistence</span>
+            </div>
+            <div class="eco-stack-row eco-stack-lc">
+              <strong style="color: var(--lc-label)">LangChain</strong>
+              <span>Framework — abstractions & integrations</span>
+            </div>
+          </div>
+          <div class="eco-stack-right eco-stack-front">
+            <strong style="color: var(--front-label)">Vercel AI SDK</strong>
+            <span>Streaming + React hooks</span>
+            <span>useChat(), createUI…</span>
+          </div>
+        </div>
+        <div class="eco-stack-row eco-stack-base">
+          <span>LLM Provider API (Anthropic, OpenAI, etc.)</span>
+        </div>
+        <div class="eco-stack-obs">
+          <span>Observability (side-car): <strong>LangSmith</strong> · <strong>Langfuse</strong></span>
+        </div>
+      </div>
+    </div>
+
+    <div class="eco-section">
+      <h3 style="color: var(--lc-label)">LangChain <code>langchain</code> <code>@langchain/core</code></h3>
+      <p><strong>Framework</strong> — abstractions & integrations for LLMs.</p>
+      <ul>
+        <li><strong>Chat models</strong> (<code>ChatAnthropic</code>, <code>ChatOpenAI</code>) — unified interface to call any LLM</li>
+        <li><strong>Messages</strong> (<code>HumanMessage</code>, <code>AIMessage</code>, <code>SystemMessage</code>, <code>ToolMessage</code>)</li>
+        <li><strong>Tools</strong> (<code>tool()</code>) — define tools with Zod schemas that LLMs can call</li>
+        <li><strong>Callbacks</strong> (<code>on_llm_start</code>, <code>on_tool_start</code>…) — hooks to intercept the LLM lifecycle</li>
+        <li><strong>Output parsers</strong> — parse LLM output into structured data</li>
+      </ul>
+      <p><em>When to use:</em> Getting started quickly · Standardizing how a team builds</p>
+      <p><em>Alternatives:</em> AI SDK, LlamaIndex, CrewAI, Google SDK, OpenAI Agents SDK</p>
+    </div>
+
+    <div class="eco-section">
+      <h3 style="color: var(--lg-label)">LangGraph <code>@langchain/langgraph</code></h3>
+      <p><strong>Runtime</strong> — durable execution, streaming, HITL, and persistence for stateful agents.</p>
+      <ul>
+        <li><strong>Durable execution</strong> — agents survive crashes and restarts via checkpointing</li>
+        <li><strong>Streaming</strong> — real-time token-by-token output through the agent loop</li>
+        <li><strong>Human-in-the-loop (HITL)</strong> — pause the agent, wait for user input, resume</li>
+        <li><strong>Persistence</strong> — save/restore agent state between interactions</li>
+        <li><strong>StateGraph</strong> — nodes (functions) + edges (transitions) forming the agent's decision loop</li>
+        <li><strong>createAgent()</strong> — pre-built ReAct agent (reason + act loop)</li>
+      </ul>
+      <p><em>When to use:</em> Low-level control · Long running, stateful workflows and agents</p>
+      <p><em>Alternatives:</em> Temporal, Inngest</p>
+    </div>
+
+    <div class="eco-section">
+      <h3 style="color: var(--da-label)">DeepAgents <code>deepagents</code></h3>
+      <p><strong>Harness</strong> — predefined tools, prompts, and subagents on top of LangGraph.</p>
+      <ul>
+        <li><strong>Predefined tools</strong> — filesystem tools (ls, read, write, edit, glob, grep) out of the box</li>
+        <li><strong>Prompts</strong> — skills (SKILL.md) that guide agent behavior via natural language</li>
+        <li><strong>Subagents</strong> — <code>task</code> tool for delegating work to child agents</li>
+        <li><code>createDeepAgent()</code> — one function: model, tools, skills, store, backend</li>
+      </ul>
+      <p><em>When to use:</em> More autonomous agents · Agents faced with complex, non-deterministic tasks</p>
+      <p><em>Alternative:</em> Claude Agent SDK</p>
+    </div>
+
+    <div class="eco-section">
+      <h3 style="color: var(--front-label)">Vercel AI SDK <code>ai</code> <code>@ai-sdk/react</code></h3>
+      <p><strong>Frontend integration</strong> — streaming UI, React bridge.</p>
+      <ul>
+        <li><strong>Backend:</strong> <code>createUIMessageStream()</code> — transform any stream into a UI-compatible format</li>
+        <li><strong>Frontend:</strong> <code>useChat()</code> — React hook for messages, loading, streaming</li>
+        <li><strong>Adapters:</strong> <code>@ai-sdk/langchain</code> — bridge between LangChain and Vercel AI SDK</li>
+      </ul>
+      <p>It's the plumbing between your backend agent and your React UI — framework-agnostic.</p>
+    </div>
+
+    <div class="eco-section">
+      <h3>How they connect</h3>
+      <div class="eco-diagram">User types message
+  → useChat() [Vercel AI SDK]
+  → POST /api/chat
+  → ChatAnthropic [LangChain] inside createDeepAgent() [DeepAgents/LangGraph]
+  → agent.stream() with Langfuse callbacks [LangChain callbacks]
+  → parseLangChainStream() → createUIMessageStream() [Vercel AI SDK]
+  → useChat() renders streaming response</div>
+    </div>
+
+    <div class="eco-section">
+      <h3>npm packages</h3>
+      <table class="eco-packages">
+        <tr><th>Package</th><th>What</th><th>Layer</th></tr>
+        <tr><td><code>@langchain/core</code></td><td>Messages, tools, callbacks, base classes</td><td>LangChain</td></tr>
+        <tr><td><code>@langchain/anthropic</code></td><td>ChatAnthropic model</td><td>LangChain</td></tr>
+        <tr><td><code>langchain</code></td><td>High-level utilities, tool() helper</td><td>LangChain</td></tr>
+        <tr><td><code>@langchain/langgraph</code></td><td>StateGraph, nodes/edges</td><td>LangGraph</td></tr>
+        <tr><td><code>@langchain/langgraph-checkpoint</code></td><td>InMemoryStore, checkpointing</td><td>LangGraph</td></tr>
+        <tr><td><code>deepagents</code></td><td>createDeepAgent, FilesystemBackend, skills</td><td>DeepAgents</td></tr>
+        <tr><td><code>ai</code></td><td>createUIMessageStream, server utilities</td><td>Vercel AI SDK</td></tr>
+        <tr><td><code>@ai-sdk/react</code></td><td>useChat(), useCompletion()</td><td>Vercel AI SDK</td></tr>
+        <tr><td><code>@ai-sdk/langchain</code></td><td>Bridge LangChain ↔ Vercel AI SDK</td><td>Bridge</td></tr>
+      </table>
+    </div>
+  </div>
+</div>
+
+<script src="learning-map-data.js"></script>
+<script>
+// EXERCISES and LAYER_META are loaded from learning-map-data.js
+// (see <script src> above)
+// ════════════════════════════════════════════════════════════
+// RENDER DOM
+// ════════════════════════════════════════════════════════════
+const container = document.getElementById('treeContainer');
+const tooltip = document.getElementById('tooltip');
+const detailPanel = document.getElementById('detailPanel');
+const detailContent = document.getElementById('detailContent');
+const detailClose = document.getElementById('detailClose');
+const legendEl = document.getElementById('legend');
+
+// ── Render legend with hover tooltips ──
+const LEGEND_ITEMS = ['lc', 'lg', 'da', 'front'];
+
+LEGEND_ITEMS.forEach((layer) => {
+  const meta = LAYER_META[layer];
+  const item = document.createElement('div');
+  item.className = 'legend-item';
+  item.dataset.layer = layer;
+  item.innerHTML = `
+    <div class="legend-swatch" style="background: ${meta.glowColor}"></div>
+    ${meta.label}
+    <div class="legend-tooltip">
+      <div class="legend-tooltip-desc">${meta.tooltip}</div>
+    </div>
+  `;
+  legendEl.appendChild(item);
+});
+
+// Static "Prerequisite" legend item
+const prereqItem = document.createElement('div');
+prereqItem.className = 'legend-item';
+prereqItem.innerHTML = `<div class="legend-line" style="background: var(--lc-glow); opacity: 0.5"></div> Prerequisite`;
+legendEl.appendChild(prereqItem);
+
+// Helper: create a node element for an exercise
+function createNodeEl(ex, animDelay) {
+  const meta = LAYER_META[ex.layer];
+  const node = document.createElement('div');
+  node.className = `node ${ex.done ? 'node--done' : 'node--future'}`;
+  node.dataset.id = ex.id;
+  node.dataset.layer = ex.layer;
+  node.style.setProperty('--glow-color', meta.glowColor);
+  node.style.animationDelay = `${animDelay}s`;
+
+  node.innerHTML = `
+    <div class="node-header">
+      <span class="node-number">${ex.id}</span>
+      <span class="node-status ${ex.done ? 'node-status--done' : 'node-status--future'}"></span>
+    </div>
+    <div class="node-title">${ex.title}</div>
+    <div class="node-concepts">${ex.concepts}</div>
+  `;
+
+  node.addEventListener('mouseenter', (e) => showTooltip(e, ex));
+  node.addEventListener('mouseleave', hideTooltip);
+  node.addEventListener('click', () => showDetail(ex, meta));
+
+  return node;
+}
+
+// ── Phase 1: Trunk layers (01-08) with layer bands ──
+const trunkLayers = ['lc', 'lg', 'da'];
+
+trunkLayers.forEach((layerId, layerIdx) => {
+  const exercises = EXERCISES.filter(e => e.section === 'trunk' && e.layer === layerId);
+  if (!exercises.length) return;
+  const meta = LAYER_META[layerId];
+
+  const layerEl = document.createElement('div');
+  layerEl.className = `layer ${meta.className}`;
+
+  const label = document.createElement('div');
+  label.className = 'layer-label';
+  label.innerHTML = `
+    <span class="layer-label-name">${meta.label}</span>
+    <span class="layer-tagline">${meta.tagline}</span>
+    <span class="layer-builds-on">${meta.buildsOn}</span>
+  `;
+  layerEl.appendChild(label);
+
+  const nodesContainer = document.createElement('div');
+  nodesContainer.className = 'layer-nodes';
+
+  exercises.forEach((ex, nodeIdx) => {
+    nodesContainer.appendChild(createNodeEl(ex, layerIdx * 0.2 + nodeIdx * 0.1));
+  });
+
+  layerEl.appendChild(nodesContainer);
+  container.appendChild(layerEl);
+});
+
+// ── Phase 2: Branches section (09-13) ──
+const branchExercises = EXERCISES.filter(e => e.section === 'branches');
+if (branchExercises.length) {
+  const section = document.createElement('div');
+  section.className = 'branches-section';
+
+  const sectionLabel = document.createElement('div');
+  sectionLabel.className = 'branches-section-label';
+  sectionLabel.textContent = 'Advanced patterns';
+  section.appendChild(sectionLabel);
+
+  const grid = document.createElement('div');
+  grid.className = 'branches-grid';
+
+  branchExercises.forEach((ex, i) => {
+    grid.appendChild(createNodeEl(ex, 0.8 + i * 0.1));
+  });
+
+  section.appendChild(grid);
+  container.appendChild(section);
+}
+
+// ════════════════════════════════════════════════════════════
+// SVG CONNECTIONS — smart routing
+// ════════════════════════════════════════════════════════════
+function createSVG() {
+  const old = container.querySelector('.connections-svg');
+  if (old) old.remove();
+
+  const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+  svg.classList.add('connections-svg');
+  const cw = container.scrollWidth, ch = container.scrollHeight;
+  svg.setAttribute('width', cw);
+  svg.setAttribute('height', ch);
+  svg.setAttribute('viewBox', `0 0 ${cw} ${ch}`);
+
+  container.prepend(svg);
+
+  // Get element position relative to container WITHOUT CSS transform influence
+  function getOffsetPos(el) {
+    let x = 0, y = 0;
+    let cur = el;
+    while (cur && cur !== container) {
+      x += cur.offsetLeft;
+      y += cur.offsetTop;
+      cur = cur.offsetParent;
+    }
+    return { x, y, w: el.offsetWidth, h: el.offsetHeight };
+  }
+
+  function getEdge(id, side) {
+    const el = container.querySelector(`[data-id="${id}"]`);
+    if (!el) return null;
+    const { x, y, w, h } = getOffsetPos(el);
+    switch (side) {
+      case 'top':    return { x: x + w / 2, y };
+      case 'bottom': return { x: x + w / 2, y: y + h };
+      case 'left':   return { x, y: y + h / 2 };
+      case 'right':  return { x: x + w, y: y + h / 2 };
+    }
+  }
+
+  function getNodeRect(id) {
+    const el = container.querySelector(`[data-id="${id}"]`);
+    if (!el) return null;
+    const { x, y, w, h } = getOffsetPos(el);
+    return {
+      left: x,
+      top: y,
+      right: x + w,
+      bottom: y + h,
+      cx: x + w / 2,
+      cy: y + h / 2,
+      width: w,
+      height: h
+    };
+  }
+
+  function routeLine(fromId, toId) {
+    const fr = getNodeRect(fromId);
+    const tr = getNodeRect(toId);
+    if (!fr || !tr) return null;
+
+    const GAP = 3; // space for arrow marker
+
+    // Same row? Check vertical overlap
+    const sameRow = !(fr.bottom < tr.top - 10 || tr.bottom < fr.top - 10);
+
+    if (sameRow) {
+      // Horizontal connection: right edge → left edge
+      const goingRight = fr.cx < tr.cx;
+      const from = getEdge(fromId, goingRight ? 'right' : 'left');
+      const to = getEdge(toId, goingRight ? 'left' : 'right');
+      // Pull endpoint away from card
+      to.x += goingRight ? -GAP : GAP;
+      const dist = Math.abs(to.x - from.x);
+      const cp = dist * 0.35;
+      return `M ${from.x} ${from.y} C ${from.x + (goingRight ? cp : -cp)} ${from.y}, ${to.x + (goingRight ? -cp : cp)} ${to.y}, ${to.x} ${to.y}`;
+    } else {
+      // Check if this is a long cross-section connection (trunk → branches)
+      // that should route laterally to avoid crossing through intermediate nodes
+      const sourceEx = EXERCISES.find(e => e.id === fromId);
+      const targetEx = EXERCISES.find(e => e.id === toId);
+      const needsLateral = sourceEx && targetEx &&
+        sourceEx.section === 'trunk' && targetEx.section === 'branches' &&
+        sourceEx.layer !== 'da'; // DA→branches is adjacent, stays direct
+
+      if (needsLateral) {
+        // Route via lateral arc: exit bottom → swing to RIGHT edge → enter top
+        // Always right to avoid layer labels on the left
+        const from = getEdge(fromId, 'bottom');
+        const to = getEdge(toId, 'top');
+        to.y -= GAP;
+        const dy = to.y - from.y;
+
+        const edgeX = cw - 20;
+        const corridorX = from.x + (edgeX - from.x) * 0.65;
+
+        const cp1x = corridorX;
+        const cp1y = from.y + dy * 0.3;
+        const cp2x = to.x + (corridorX - to.x) * 0.2;
+        const cp2y = to.y - dy * 0.3;
+
+        return `M ${from.x} ${from.y} C ${cp1x} ${cp1y}, ${cp2x} ${cp2y}, ${to.x} ${to.y}`;
+      }
+
+      // Adjacent cross-layer connection — direct bezier
+      const goingDown = fr.cy < tr.cy;
+      if (goingDown) {
+        // Downward: bottom → top
+        const from = getEdge(fromId, 'bottom');
+        const to = getEdge(toId, 'top');
+        to.y -= GAP;
+        const dy = to.y - from.y;
+        const cp = Math.max(dy * 0.45, 40);
+        return `M ${from.x} ${from.y} C ${from.x} ${from.y + cp}, ${to.x} ${to.y - cp}, ${to.x} ${to.y}`;
+      } else {
+        // Upward: top → bottom (e.g. DA layer → LG layer)
+        const from = getEdge(fromId, 'top');
+        const to = getEdge(toId, 'bottom');
+        to.y += GAP;
+        const dy = from.y - to.y;
+        const cp = Math.max(dy * 0.45, 40);
+        return `M ${from.x} ${from.y} C ${from.x} ${from.y - cp}, ${to.x} ${to.y + cp}, ${to.x} ${to.y}`;
+      }
+    }
+  }
+
+  // Draw prerequisite lines
+  EXERCISES.forEach((ex, i) => {
+    ex.prereqs.forEach(prereqId => {
+      const d = routeLine(prereqId, ex.id);
+      if (!d) return;
+
+      const sourceEx = EXERCISES.find(e => e.id === prereqId);
+      const color = LAYER_META[sourceEx.layer].lineColor;
+      const delay = `${i * 0.06}s`;
+
+      // Detect cross-section connections (trunk → branches)
+      const isCrossSection = sourceEx.section === 'trunk' &&
+        EXERCISES.find(e => e.id === ex.id)?.section === 'branches';
+
+      const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+      path.setAttribute('d', d);
+      path.classList.add('conn-prereq');
+      if (isCrossSection) path.classList.add('conn-cross-section');
+      path.style.stroke = color;
+      path.style.animationDelay = delay;
+      path.dataset.from = prereqId;
+      path.dataset.to = ex.id;
+      svg.appendChild(path);
+
+      // Filled arrowhead — line stops at arrow base, base is perpendicular
+      const len = path.getTotalLength();
+      const ARROW_LEN = 8, ARROW_HALF_W = 4;
+      const tip = path.getPointAtLength(len);
+      const base = path.getPointAtLength(len - ARROW_LEN);
+      // Clip the line so it stops at the arrow base + animate draw
+      const visibleLen = len - ARROW_LEN;
+      path.style.strokeDasharray = `${visibleLen} ${len}`;
+      path.style.setProperty('--line-len', visibleLen);
+      // Direction & perpendicular
+      const angle = Math.atan2(tip.y - base.y, tip.x - base.x);
+      const perp = angle + Math.PI / 2;
+      const bx1 = base.x + ARROW_HALF_W * Math.cos(perp);
+      const by1 = base.y + ARROW_HALF_W * Math.sin(perp);
+      const bx2 = base.x - ARROW_HALF_W * Math.cos(perp);
+      const by2 = base.y - ARROW_HALF_W * Math.sin(perp);
+      const arrow = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
+      arrow.setAttribute('points', `${bx1},${by1} ${tip.x},${tip.y} ${bx2},${by2}`);
+      arrow.classList.add('conn-arrow');
+      if (isCrossSection) arrow.classList.add('arrow-cross-section');
+      arrow.style.fill = color;
+      arrow.style.animationDelay = `${parseFloat(delay) + 0.5}s`;
+      arrow.dataset.from = prereqId;
+      arrow.dataset.to = ex.id;
+      svg.appendChild(arrow);
+    });
+  });
+
+  // Add morph icons on connections that have mutation data.
+  // Icons live in document.body (NOT in the container) because appending any
+  // element to the container changes scrollWidth/scrollHeight, which breaks
+  // the SVG viewBox calculation. Icons use page-absolute coordinates derived
+  // from the container's position + SVG midpoint.
+  if (typeof MUTATIONS !== 'undefined') {
+    // Remove old morph icons from previous createSVG calls
+    document.querySelectorAll('.morph-icon').forEach(el => el.remove());
+
+    // Convert container-relative coords to page-absolute coords
+    const cr = container.getBoundingClientRect();
+    const pageOffX = cr.left + window.scrollX;
+    const pageOffY = cr.top + window.scrollY;
+
+    MUTATIONS.forEach(mutation => {
+      const path = svg.querySelector(`.conn-prereq[data-from="${mutation.from}"][data-to="${mutation.to}"]`);
+      if (!path) return;
+
+      // Icon appears when the line animation reaches its midpoint (50% of drawLine)
+      const lineDelay = parseFloat(path.style.animationDelay) || 0;
+      const iconDelay = lineDelay + 0.25; // drawLine is 0.5s, icon is at 50%
+
+      const len = path.getTotalLength();
+      const mid = path.getPointAtLength(len / 2);
+      const SIZE = 28;
+
+      const icon = document.createElement('div');
+      icon.className = 'morph-icon';
+      icon.style.left = `${pageOffX + mid.x - SIZE / 2}px`;
+      icon.style.top = `${pageOffY + mid.y - SIZE / 2}px`;
+      icon.style.animationDelay = `${iconDelay}s`;
+      icon.innerHTML = '<span class="morph-icon-text">&lt;/&gt;</span>';
+
+      icon.addEventListener('click', (e) => {
+        e.stopPropagation();
+        openMorphModal(mutation);
+      });
+
+      document.body.appendChild(icon);
+    });
+  }
+}
+
+// Draw connections once the first node animation ends (layout is stable)
+const firstNode = container.querySelector('.node');
+let svgReady = false;
+function initSVG() {
+  if (svgReady) return;
+  svgReady = true;
+  createSVG();
+  let resizeTimer;
+  window.addEventListener('resize', () => {
+    clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(createSVG, 150);
+  });
+}
+if (firstNode) {
+  firstNode.addEventListener('animationend', initSVG, { once: true });
+}
+// Fallback
+setTimeout(initSVG, 800);
+
+// ════════════════════════════════════════════════════════════
+// TOOLTIP (hover)
+// ════════════════════════════════════════════════════════════
+function showTooltip(event, ex) {
+  if (!ex.apis.length) { tooltip.classList.remove('tooltip--visible'); return; }
+
+  tooltip.innerHTML = `
+    <div class="tooltip-apis-label">Key APIs</div>
+    <div class="tooltip-apis">${ex.apis.map(a => `<span class="api-tag">${typeof a === 'string' ? a : a.name}</span>`).join('')}</div>
+  `;
+  tooltip.classList.add('tooltip--visible');
+
+  const nr = event.currentTarget.getBoundingClientRect();
+  tooltip.style.left = '0px';
+  tooltip.style.top = '0px';
+  const tr = tooltip.getBoundingClientRect();
+
+  let left = nr.left + nr.width / 2 - tr.width / 2;
+  let top = nr.bottom + 10;
+
+  if (left < 8) left = 8;
+  if (left + tr.width > window.innerWidth - 8) left = window.innerWidth - tr.width - 8;
+  if (top + tr.height > window.innerHeight - 8) top = nr.top - tr.height - 10;
+
+  tooltip.style.left = left + 'px';
+  tooltip.style.top = top + 'px';
+
+  highlightConnections(ex.id);
+}
+
+function hideTooltip() {
+  tooltip.classList.remove('tooltip--visible');
+  if (currentDetailEx) {
+    // Restore highlights for the active panel's node
+    clearHighlights();
+    highlightConnections(currentDetailEx.id);
+  } else {
+    clearHighlights();
+  }
+}
+
+function highlightConnections(id) {
+  const svg = container.querySelector('.connections-svg');
+  if (!svg) return;
+  svg.querySelectorAll('[data-from][data-to]').forEach(el => {
+    if (el.dataset.from === id || el.dataset.to === id) {
+      el.classList.add('conn-highlight');
+    }
+  });
+}
+
+function clearHighlights() {
+  const svg = container.querySelector('.connections-svg');
+  if (!svg) return;
+  svg.querySelectorAll('.conn-highlight').forEach(p => p.classList.remove('conn-highlight'));
+}
+
+// ════════════════════════════════════════════════════════════
+// DETAIL PANEL (click)
+// ════════════════════════════════════════════════════════════
+
+// Color mappings for inline styles (CSS vars can't be set dynamically on pseudo-elements easily)
+const LAYER_COLORS = {
+  lc: { accent: '#34d399', accentBg: 'rgba(52, 211, 153, 0.06)', label: '#6ee7b7', bg: 'rgba(52, 211, 153, 0.08)', border: 'rgba(52, 211, 153, 0.25)' },
+  lg: { accent: '#38bdf8', accentBg: 'rgba(56, 189, 248, 0.05)', label: '#7dd3fc', bg: 'rgba(56, 189, 248, 0.06)', border: 'rgba(56, 189, 248, 0.2)' },
+  da: { accent: '#fb923c', accentBg: 'rgba(251, 146, 60, 0.05)', label: '#fdba74', bg: 'rgba(251, 146, 60, 0.06)', border: 'rgba(251, 146, 60, 0.2)' },
+  front: { accent: '#f472b6', accentBg: 'rgba(244, 114, 182, 0.05)', label: '#f9a8d4', bg: 'rgba(244, 114, 182, 0.06)', border: 'rgba(244, 114, 182, 0.2)' }
+};
+
+// Current detail state — needed for API inspect back navigation
+let currentDetailEx = null;
+let currentDetailLayer = null;
+
+function showDetail(ex, layer) {
+  currentDetailEx = ex;
+  currentDetailLayer = layer;
+  clearHighlights();
+  highlightConnections(ex.id);
+  const colors = LAYER_COLORS[ex.layer];
+
+  detailPanel.style.setProperty('--panel-accent', colors.accent);
+  detailPanel.style.setProperty('--panel-accent-bg', colors.accentBg);
+
+  const progressDots = EXERCISES.map(e => {
+    const isCurrent = e.id === ex.id;
+    const dotColor = isCurrent ? colors.accent : (e.done ? 'rgba(255,255,255,0.15)' : undefined);
+    const style = dotColor ? `background:${dotColor};` : '';
+    const cls = `detail-progress-dot ${e.done ? 'detail-progress-dot--done' : 'detail-progress-dot--future'} ${isCurrent ? 'detail-progress-dot--current' : ''}`;
+    return `<div class="${cls}" style="${style}" title="${e.id} — ${e.title}"></div>`;
+  }).join('');
+
+  const bridgesHtml = ex.shared.length > 0
+    ? ex.shared.map(s =>
+        s.targets.map(t =>
+          `<span class="detail-bridge">${s.concept} <span class="detail-bridge-arrow">&rarr;</span> <span class="detail-bridge-target">${t}</span></span>`
+        ).join('')
+      ).join('')
+    : '';
+
+  const leftCol = `
+    <div class="detail-left">
+      <div class="detail-header">
+        <div class="detail-number" style="color:${colors.accent}">${ex.id}</div>
+        <div class="detail-title-group">
+          <div class="detail-title">${ex.title}</div>
+          <div class="detail-meta">
+            <span class="detail-layer-badge" style="background:${colors.bg};color:${colors.label};border:1px solid ${colors.border}">${layer.label}</span>
+            <span class="detail-status-badge ${ex.done ? 'detail-status-badge--done' : 'detail-status-badge--future'}">
+              ${ex.done ? 'Completed' : 'Locked'}
+            </span>
+          </div>
+        </div>
+      </div>
+      <div class="detail-progress">${progressDots}</div>
+      ${bridgesHtml ? `
+        <div class="detail-section">
+          <div class="detail-section-label">Shared concepts</div>
+          <div class="detail-bridges">${bridgesHtml}</div>
+        </div>
+      ` : ''}
+      ${ex.insights && ex.insights.length ? `
+        <div class="detail-section">
+          <div class="detail-section-label">Key insights</div>
+          <div class="detail-insights">
+            ${ex.insights.map(i => `<div class="detail-insight">${i}</div>`).join('')}
+          </div>
+        </div>
+      ` : ''}
+    </div>
+  `;
+
+  const rightCol = ex.done ? buildDoneRightCol(ex) : buildFutureRightCol(ex);
+
+  detailContent.innerHTML = `${leftCol}<div class="detail-divider"></div>${rightCol}`;
+  detailPanel.classList.add('detail-panel--visible');
+
+  // Reserve space at bottom so the page content isn't hidden behind the fixed panel,
+  // then scroll the card to the center of the visible area above the panel
+  requestAnimationFrame(() => {
+    const panelH = detailPanel.offsetHeight;
+    document.body.style.paddingBottom = panelH + 'px';
+
+    const node = container.querySelector(`[data-id="${ex.id}"]`);
+    if (node) {
+      const nodeRect = node.getBoundingClientRect();
+      const visibleH = window.innerHeight - panelH;
+      const targetY = window.scrollY + nodeRect.top + nodeRect.height / 2 - visibleH / 2;
+      window.scrollTo({ top: Math.max(0, targetY), behavior: 'smooth' });
+    }
+  });
+
+  bindDetailInteractions(ex);
+
+  // Highlight code snippet with Shiki (non-blocking)
+  if (ex.code && ex.done) {
+    highlightDetailCode(ex.code);
+  }
+}
+
+function escapeHtml(str) {
+  return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+}
+
+function buildDoneRightCol(ex) {
+  const apisHtml = ex.apis.map((a, i) => {
+    const name = typeof a === 'string' ? a : a.name;
+    const hasDetail = typeof a !== 'string' && a.detail;
+    return `<span class="api-tag${hasDetail ? '' : ''}" ${hasDetail ? `data-api-idx="${i}"` : ''}>${name}</span>`;
+  }).join('');
+
+  const prereqsHtml = ex.prereqs.length > 0
+    ? ex.prereqs.map(pId => {
+        const pEx = EXERCISES.find(e => e.id === pId);
+        return `<span class="detail-prereq-chip" data-navigate="${pId}">
+          <span class="detail-prereq-num">${pId}</span> ${pEx ? pEx.title : pId}
+        </span>`;
+      }).join('')
+    : '<span style="font-size:0.75rem;color:var(--text-muted)">None — starting point</span>';
+
+  const codeSection = ex.code ? `
+      <div class="detail-code-section">
+        <div class="detail-section-label">Key pattern</div>
+        <div class="detail-code" id="detailCodeContainer">${escapeHtml(ex.code)}</div>
+      </div>
+  ` : '';
+
+  return `
+    <div class="detail-right" id="detailRight">
+      <div class="detail-section">
+        <div class="detail-section-label">Key APIs <span style="opacity:0.5;font-weight:400">— click to inspect</span></div>
+        <div class="detail-apis">${apisHtml}</div>
+      </div>
+      <div class="detail-section">
+        <div class="detail-section-label">Prerequisites</div>
+        <div class="detail-prereqs">${prereqsHtml}</div>
+      </div>
+      ${codeSection}
+    </div>
+  `;
+}
+
+function buildFutureRightCol(ex) {
+  const prereqsHtml = ex.prereqs.map(pId => {
+    const pEx = EXERCISES.find(e => e.id === pId);
+    const done = pEx && pEx.done;
+    const icon = done ? '<span style="color:#34d399">&#10003;</span>' : '<span style="color:var(--text-muted)">&#9675;</span>';
+    return `<span class="detail-prereq-chip" data-navigate="${pId}" style="${done ? 'border-color:rgba(52,211,153,0.2)' : ''}">
+      ${icon} <span class="detail-prereq-num">${pId}</span> ${pEx ? pEx.title : pId}
+    </span>`;
+  }).join('');
+
+  const completedPrereqs = ex.prereqs.filter(pId => { const p = EXERCISES.find(e => e.id === pId); return p && p.done; }).length;
+
+  return `
+    <div class="detail-right" id="detailRight">
+      <div class="detail-section">
+        <div class="detail-locked-msg">
+          Next in the learning path.<br>
+          <strong>${completedPrereqs}/${ex.prereqs.length}</strong> prerequisites completed.
+        </div>
+      </div>
+      <div class="detail-section">
+        <div class="detail-section-label">Requires</div>
+        <div class="detail-prereqs">${prereqsHtml}</div>
+      </div>
+    </div>
+  `;
+}
+
+function showApiInspect(ex, apiIdx) {
+  const api = ex.apis[apiIdx];
+  if (!api || typeof api === 'string') return;
+
+  const rightEl = document.getElementById('detailRight');
+  if (!rightEl) return;
+
+  rightEl.style.animation = 'none';
+  rightEl.offsetHeight; // trigger reflow
+  rightEl.style.animation = 'detailFadeUp 0.25s cubic-bezier(0.16, 1, 0.3, 1) backwards';
+
+  rightEl.innerHTML = `
+    <div class="api-inspect">
+      <button class="api-inspect-back" id="apiInspectBack">&larr; All APIs</button>
+      <div class="api-inspect-name">${api.name}</div>
+      ${api.from ? `<div class="api-inspect-from">${api.from}</div>` : ''}
+      ${api.signature ? `<div class="api-inspect-signature">${api.signature}</div>` : ''}
+      <div class="api-inspect-detail">${api.detail}</div>
+    </div>
+  `;
+
+  // Highlight the active tag in the left column (if visible in apis list)
+  detailContent.querySelectorAll('.api-tag').forEach(t => t.classList.remove('api-tag--active'));
+  const activeTag = detailContent.querySelector(`[data-api-idx="${apiIdx}"]`);
+  if (activeTag) activeTag.classList.add('api-tag--active');
+
+  document.getElementById('apiInspectBack').addEventListener('click', (e) => {
+    e.stopPropagation();
+    // Restore the right column
+    rightEl.style.animation = 'none';
+    rightEl.offsetHeight;
+    rightEl.style.animation = 'detailFadeUp 0.25s cubic-bezier(0.16, 1, 0.3, 1) backwards';
+    rightEl.outerHTML = buildDoneRightCol(ex);
+    detailContent.querySelectorAll('.api-tag').forEach(t => t.classList.remove('api-tag--active'));
+    bindDetailInteractions(ex);
+    if (ex.code) highlightDetailCode(ex.code);
+  });
+}
+
+function bindDetailInteractions(ex) {
+  // API tags clickable
+  detailContent.querySelectorAll('[data-api-idx]').forEach(tag => {
+    tag.addEventListener('click', (e) => {
+      e.stopPropagation();
+      showApiInspect(ex, parseInt(tag.dataset.apiIdx));
+    });
+  });
+
+  // Prereq chips navigable
+  detailContent.querySelectorAll('[data-navigate]').forEach(chip => {
+    chip.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const targetId = chip.dataset.navigate;
+      const targetEx = EXERCISES.find(ex => ex.id === targetId);
+      if (targetEx) {
+        showDetail(targetEx, LAYER_META[targetEx.layer]);
+        const targetNode = container.querySelector(`[data-id="${targetId}"]`);
+        if (targetNode) targetNode.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+    });
+  });
+}
+
+async function highlightDetailCode(code) {
+  const container = document.getElementById('detailCodeContainer');
+  if (!container) return;
+  try {
+    const { machine, MagicMoveRenderer } = await getShikiEngine();
+    const step = machine.commit(code).current;
+    const renderer = new MagicMoveRenderer(container);
+    container.textContent = '';
+    renderer.replace(step);
+  } catch {
+    // Fallback: keep the escaped text as-is
+  }
+}
+
+function closeDetailPanel() {
+  currentDetailEx = null;
+  currentDetailLayer = null;
+  detailPanel.classList.remove('detail-panel--visible');
+  document.body.style.paddingBottom = '';
+  clearHighlights();
+}
+
+detailClose.addEventListener('click', closeDetailPanel);
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') {
+    const morphOverlay = document.getElementById('morphOverlay');
+    if (morphOverlay.classList.contains('morph-overlay--visible')) {
+      closeMorphModal();
+    } else {
+      closeDetailPanel();
+    }
+  }
+});
+document.addEventListener('click', (e) => {
+  if (!detailPanel.contains(e.target) && !e.target.closest('.node') && !e.target.closest('.morph-icon')) {
+    closeDetailPanel();
+  }
+});
+
+// ════════════════════════════════════════════════════════════
+// MORPH MODAL & ENGINE (powered by Shiki Magic Move)
+// ════════════════════════════════════════════════════════════
+
+// Lazy-loaded Shiki + Magic Move modules (fetched on first morph-icon click)
+let shikiReady = null; // Promise that resolves to { machine, MagicMoveRenderer }
+
+function getShikiEngine() {
+  if (shikiReady) return shikiReady;
+  shikiReady = (async () => {
+    const [{ createHighlighter }, { codeToKeyedTokens, createMagicMoveMachine }, { MagicMoveRenderer }] = await Promise.all([
+      import('https://esm.sh/shiki@3'),
+      import('https://esm.sh/shiki-magic-move@0.5/core'),
+      import('https://esm.sh/shiki-magic-move@0.5/renderer'),
+    ]);
+
+    const highlighter = await createHighlighter({
+      themes: ['vitesse-dark'],
+      langs: ['javascript'],
+    });
+    const machine = createMagicMoveMachine(
+      code => codeToKeyedTokens(highlighter, code, { lang: 'javascript', theme: 'vitesse-dark' }),
+    );
+    return { machine, MagicMoveRenderer };
+  })();
+  return shikiReady;
+}
+
+async function openMorphModal(mutation) {
+  const morphOverlay = document.getElementById('morphOverlay');
+  const fromEx = EXERCISES.find(e => e.id === mutation.from);
+  const toEx = EXERCISES.find(e => e.id === mutation.to);
+
+  document.getElementById('morphModalTitle').innerHTML = `
+    <span>${fromEx.id} ${fromEx.title}</span>
+    <span class="morph-modal-arrow">&rarr;</span>
+    <span>${toEx.id} ${toEx.title}</span>
+  `;
+
+  const modalContent = document.getElementById('morphModalContent');
+  modalContent.innerHTML = '<div style="text-align:center;color:var(--text-secondary);padding:24px;">Loading...</div>';
+  morphOverlay.classList.add('morph-overlay--visible');
+
+  const { machine, MagicMoveRenderer } = await getShikiEngine();
+
+  modalContent.innerHTML = '';
+
+  mutation.blocks.forEach(block => {
+    const blockEl = document.createElement('div');
+    blockEl.className = 'morph-block';
+
+    const legend = document.createElement('div');
+    legend.className = 'morph-legend';
+    legend.innerHTML = block.legend;
+    blockEl.appendChild(legend);
+
+    const codeContainer = document.createElement('div');
+    codeContainer.className = 'morph-code';
+    blockEl.appendChild(codeContainer);
+
+    // Compile before/after steps
+    const beforeStep = machine.commit(block.before).current;
+    const afterStep = machine.commit(block.after).current;
+
+    const renderer = new MagicMoveRenderer(codeContainer);
+
+    const controls = document.createElement('div');
+    controls.className = 'morph-controls';
+    controls.innerHTML = `
+      <button class="morph-btn morph-btn-before morph-btn--active" data-action="before">&lsaquo; Before</button>
+      <button class="morph-btn morph-btn-play" data-action="play"><svg class="morph-btn-play-icon" width="10" height="10" viewBox="0 0 10 10"><polygon points="1,0 9,5 1,10" fill="currentColor"/></svg><span class="morph-btn-play-label"><span class="morph-btn-play-label-play">Play</span><span class="morph-btn-play-label-revert">Revert</span></span></button>
+      <button class="morph-btn morph-btn-after" data-action="after">After &rsaquo;</button>
+    `;
+    blockEl.appendChild(controls);
+    modalContent.appendChild(blockEl);
+
+    // Pre-measure both heights (element must be in DOM for offsetHeight)
+    // All synchronous — browser won't paint between replace() calls
+    renderer.replace(beforeStep);
+    const beforeH = codeContainer.offsetHeight;
+    renderer.replace(afterStep);
+    const afterH = codeContainer.offsetHeight;
+    renderer.replace(beforeStep);
+    codeContainer.style.height = beforeH + 'px';
+    codeContainer.style.overflow = 'hidden';
+    let state = 'before';
+
+    const playBtn = controls.querySelector('.morph-btn-play');
+
+    function updateButtons(newState) {
+      state = newState;
+      controls.querySelectorAll('.morph-btn').forEach(b => b.classList.remove('morph-btn--active'));
+      if (state === 'before') {
+        controls.querySelector('.morph-btn-before').classList.add('morph-btn--active');
+        playBtn.classList.remove('morph-btn-play--after');
+      } else {
+        controls.querySelector('.morph-btn-after').classList.add('morph-btn--active');
+        playBtn.classList.add('morph-btn-play--after');
+      }
+    }
+
+    controls.addEventListener('click', async (e) => {
+      const btn = e.target.closest('[data-action]');
+      if (!btn) return;
+      const action = btn.dataset.action;
+
+      if (action === 'before') {
+        renderer.replace(beforeStep);
+        codeContainer.style.transition = 'none';
+        codeContainer.style.height = beforeH + 'px';
+        updateButtons('before');
+      } else if (action === 'after') {
+        renderer.replace(afterStep);
+        codeContainer.style.transition = 'none';
+        codeContainer.style.height = afterH + 'px';
+        updateButtons('after');
+      } else if (action === 'play') {
+        codeContainer.style.transition = 'height 0.8s ease';
+        if (state === 'after') {
+          codeContainer.style.height = beforeH + 'px';
+          updateButtons('before');
+          await renderer.render(beforeStep);
+        } else {
+          codeContainer.style.height = afterH + 'px';
+          updateButtons('after');
+          await renderer.render(afterStep);
+        }
+      }
+    });
+
+  });
+}
+
+function closeMorphModal() {
+  document.getElementById('morphOverlay').classList.remove('morph-overlay--visible');
+}
+
+document.getElementById('morphModalClose').addEventListener('click', closeMorphModal);
+document.getElementById('morphOverlay').addEventListener('click', (e) => {
+  if (e.target === document.getElementById('morphOverlay')) closeMorphModal();
+});
+
+// Preload Shiki engine in background so it's ready when user clicks
+if (typeof MUTATIONS !== 'undefined' && MUTATIONS.length > 0) {
+  requestIdleCallback(() => getShikiEngine());
+}
+
+// ── Ecosystem glossary panel ──
+const ecoOverlay = document.getElementById('ecoOverlay');
+document.getElementById('ecoBtn').addEventListener('click', () => {
+  ecoOverlay.classList.add('eco-overlay--visible');
+});
+document.getElementById('ecoClose').addEventListener('click', () => {
+  ecoOverlay.classList.remove('eco-overlay--visible');
+});
+ecoOverlay.addEventListener('click', (e) => {
+  if (e.target === ecoOverlay) ecoOverlay.classList.remove('eco-overlay--visible');
+});
+</script>
+</body>
+</html>
