@@ -19,15 +19,15 @@ const EXERCISES = [
     ],
     steps: [
       {
-        instruction: 'Dans Notion, ouvrez le menu latéral et cliquez sur <strong>Custom Agents</strong> (ou accédez via <strong>Settings & members &rarr; Custom Agents</strong>).',
-        expected: 'La page de gestion des Custom Agents s\'affiche. Vous voyez la liste des agents existants ou un écran vide si c\'est votre premier.'
+        instruction: 'Dans Notion, ouvrez le menu latéral et cliquez sur <strong>Agents</strong>, puis sur le bouton <strong>+</strong> pour créer un nouvel agent.<br><em>Note : Les Custom Agents nécessitent un plan Notion <strong>Business</strong> ou <strong>Enterprise</strong>.</em>',
+        expected: 'La page de gestion des Agents s\'affiche. Vous voyez la liste des agents existants ou un écran vide si c\'est votre premier.'
       },
       {
-        instruction: 'Cliquez sur <strong>New agent</strong> puis choisissez <strong>From scratch</strong>. Nommez votre agent <code>Daily Digest</code>.',
+        instruction: 'Choisissez <strong>From scratch</strong> (ou utilisez <strong>Create with AI chat</strong> pour décrire votre agent en langage naturel et laisser Notion générer la configuration). Nommez votre agent <code>Daily Digest</code>.',
         expected: 'L\'éditeur d\'agent s\'ouvre avec les champs Name, Instructions, et les sections Triggers et Data sources. Le nom "Daily Digest" apparaît en haut.'
       },
       {
-        instruction: 'Dans la section <strong>Data sources</strong>, cliquez sur <strong>Add data source</strong> et sélectionnez une base de données Notion existante (ex : une base de tâches, de projets, ou de notes).',
+        instruction: 'Dans la section <strong>Data sources / Tools and Access</strong>, cliquez sur <strong>Add data source</strong> et sélectionnez une base de données Notion existante (ex : une base de tâches, de projets, ou de notes).',
         expected: 'La base apparaît dans la liste des sources avec une icône de base de données. L\'agent n\'aura accès qu\'à cette base — pas à tout le workspace.'
       },
       {
@@ -61,7 +61,7 @@ const EXERCISES = [
         detail: 'Le prompt qui guide le comportement de l\'agent. C\'est du <strong>prompt engineering pur</strong> — structure recommandée : <code>rôle → tâche → format → contraintes → langue</code>. Les instructions sont exécutées à chaque trigger. Bonnes pratiques : spécifier la langue, le format de sortie, les limites, et prévoir un cas par défaut.' },
       { name: 'Scheduled trigger',
         from: 'Custom Agent',
-        detail: 'Définit <strong>quand</strong> l\'agent s\'exécute automatiquement. Trois fréquences : <strong>daily</strong> (chaque jour à heure fixe), <strong>weekly</strong> (un jour précis), <strong>monthly</strong> (une date du mois). C\'est le trigger le plus simple — l\'agent tourne comme un cron job. Idéal pour les digests, rapports, et revues périodiques.' },
+        detail: 'Définit <strong>quand</strong> l\'agent s\'exécute automatiquement. Quatre fréquences : <strong>daily</strong> (chaque jour à heure fixe), <strong>weekly</strong> (un jour précis), <strong>monthly</strong> (une date du mois), <strong>yearly</strong> (une date dans l\'année). C\'est le trigger le plus simple — l\'agent tourne comme un cron job. Idéal pour les digests, rapports, et revues périodiques.' },
       { name: 'Data sources',
         from: 'Custom Agent',
         detail: 'Les bases de données et pages Notion auxquelles l\'agent a accès. L\'agent ne voit <strong>que</strong> les sources explicitement configurées — pas tout le workspace. C\'est le <strong>principe du moindre privilège</strong> : donnez accès uniquement aux bases nécessaires. Vous pouvez aussi ajouter des pages individuelles.' },
@@ -100,7 +100,7 @@ const EXERCISES = [
         expected: 'Le trigger apparaît avec la mention "When a page is created in [nom de la base]". L\'agent réagira à chaque nouvelle page.'
       },
       {
-        instruction: 'Ajoutez la même base de données comme <strong>Data source</strong> (nécessaire pour que l\'agent puisse la lire et y écrire).',
+        instruction: 'Ajoutez la même base de données comme <strong>Data source</strong> dans la section <strong>Data sources / Tools and Access</strong> (nécessaire pour que l\'agent puisse la lire et y écrire).',
         expected: 'La base apparaît dans les Data sources. L\'agent a maintenant le droit de lire et modifier les pages de cette base.'
       },
       {
@@ -124,7 +124,7 @@ const EXERCISES = [
     apis: [
       { name: 'Database event trigger',
         from: 'Custom Agent',
-        detail: 'Déclenche l\'agent quand un événement survient dans une base Notion. Deux types principaux : <strong>Page created</strong> (nouvelle entrée) et <strong>Page modified</strong> (mise à jour d\'une page existante). Contrairement au trigger planifié, l\'agent réagit en <strong>quasi temps réel</strong> (délai de quelques secondes à une minute).' },
+        detail: 'Déclenche l\'agent quand un événement survient dans une base Notion. Quatre types : <strong>Page added to database</strong> (nouvelle entrée), <strong>Page updated in database</strong> (mise à jour d\'une page existante), <strong>Page removed from database</strong> (page retirée), et <strong>Comment added to page</strong> (commentaire ajouté). Les agents peuvent aussi être déclenchés par <strong>@mention</strong> dans les pages ou commentaires. Contrairement au trigger planifié, l\'agent réagit en <strong>quasi temps réel</strong> (délai de quelques secondes à une minute).' },
       { name: 'Page created event',
         from: 'Database event trigger',
         detail: 'Se déclenche quand une nouvelle page est ajoutée à la base. <strong>Attention au timing</strong> : le trigger se lance dès la création, même si le contenu n\'est pas encore rempli. Pour des résultats fiables, basez vos instructions sur les <strong>propriétés</strong> (titre, select) plutôt que sur le contenu body, qui peut encore être en cours de rédaction.' },
@@ -154,7 +154,7 @@ const EXERCISES = [
     ],
     steps: [
       {
-        instruction: 'Vérifiez que la <strong>connexion Slack</strong> est active dans votre workspace Notion. Allez dans <strong>Settings & members &rarr; Connections</strong> et cherchez Slack. Si absent, demandez à un admin workspace de l\'installer.',
+        instruction: 'Vérifiez que la <strong>connexion Slack</strong> est active dans votre workspace Notion. Allez dans <strong>Settings & members &rarr; Connections</strong> et cherchez Slack. Si absent, demandez à un admin workspace de l\'installer.<br><strong>Important :</strong> Un administrateur du workspace Slack doit activer l\'intégration Notion pour les Custom Agents. De plus, votre compte Slack doit utiliser la <strong>même adresse email</strong> que votre compte Notion.',
         expected: 'Slack apparaît dans la liste des connexions avec le statut "Connected" et le nom du workspace Slack associé.'
       },
       {
@@ -193,7 +193,7 @@ const EXERCISES = [
         detail: 'Déclenche l\'agent quand un emoji spécifique est ajouté à un message dans un channel Slack public. Pattern puissant pour le <strong>triage collaboratif</strong> : l\'équipe utilise des emojis comme raccourcis d\'action (🎫 = ticket, 📌 = documenter, ⚠️ = incident). L\'agent transforme un geste simple en action structurée.' },
       { name: 'Slack trigger (autres types)',
         from: 'Custom Agent',
-        detail: 'Outre les emoji reactions, les triggers Slack incluent : <strong>Message posted</strong> (nouveau message dans un channel), <strong>Thread created</strong> (nouveau thread), <strong>@mention</strong> (quand l\'agent est mentionné). Chaque type a ses cas d\'usage — les emoji reactions sont les plus précis car intentionnels.' },
+        detail: 'Les triggers Slack disponibles : <strong>Message posted to channel</strong> (nouveau message dans un channel), <strong>Emoji reaction added to message</strong> (réaction emoji), <strong>Thread started in channel</strong> (nouveau thread), <strong>Agent mentioned in message</strong> (quand l\'agent est mentionné via @). Chaque type a ses cas d\'usage — les emoji reactions sont les plus précis car intentionnels.' },
       { name: 'Création de pages',
         from: 'Custom Agent',
         detail: 'L\'agent peut <strong>créer de nouvelles pages</strong> dans une base Notion configurée comme data source. Il remplit le titre, les propriétés (select, text, URL, etc.), et le contenu body. C\'est le pattern inverse de la lecture : au lieu de résumer des données existantes, l\'agent <strong>structure des informations externes</strong> en pages Notion.' },
@@ -292,8 +292,8 @@ const EXERCISES = [
         expected: 'L\'agent est créé avec la base dans ses sources de données.'
       },
       {
-        instruction: 'Activez la capacité <strong>Web browsing</strong> dans les paramètres de l\'agent (section capabilities ou data sources selon l\'interface).',
-        expected: 'L\'option Web browsing est activée. L\'agent peut maintenant chercher et lire des pages web.'
+        instruction: 'Dans Settings, activez le toggle <strong>Web access</strong>.',
+        expected: 'L\'option Web access est activée. L\'agent peut maintenant chercher et lire des pages web.'
       },
       {
         instruction: 'Dans <strong>Triggers</strong>, ajoutez un trigger <strong>Weekly schedule</strong>. Choisissez le lundi à 8h00.',
@@ -476,7 +476,7 @@ const EXERCISES = [
     prereqs: ['01'],
     insights: [
       '<strong>Les instructions d\'un agent sont un programme — pas un souhait.</strong> Un agent avec des instructions vagues ("résume bien les trucs") est aussi utile qu\'un programme sans spécification. La structure <code>Rôle → Tâche → Format → Contraintes</code> transforme un agent médiocre en agent fiable.',
-      '<strong>Les instructions négatives sont plus puissantes que les positives.</strong> Dire <code>"Ne résume JAMAIS en plus de 5 bullet points"</code> est plus efficace que <code>"Résume en 5 bullet points"</code>. L\'agent a tendance à ignorer les souhaits mais respecte les interdictions. Utilisez <code>JAMAIS</code>, <code>NE PAS</code>, <code>INTERDIT</code>.',
+      '<strong>Les instructions négatives sont souvent plus fiables que les positives.</strong> Dire <code>"Ne résume JAMAIS en plus de 5 bullet points"</code> est plus efficace que <code>"Résume en 5 bullet points"</code>. L\'agent a tendance à ignorer les souhaits mais respecte les interdictions. Utilisez <code>JAMAIS</code>, <code>NE PAS</code>, <code>INTERDIT</code>.',
       '<strong>Le Chat tab est votre laboratoire scientifique.</strong> Changez une seule variable à la fois dans les instructions, testez, observez. C\'est la méthode expérimentale appliquée au prompt engineering. 10 minutes d\'itération dans le Chat > 1 heure de réflexion théorique.'
     ],
     steps: [
@@ -522,7 +522,7 @@ const EXERCISES = [
         detail: 'Framework en 4 sections pour structurer les instructions d\'un agent : <strong>Rôle</strong> (qui est l\'agent), <strong>Tâche</strong> (quoi faire), <strong>Format</strong> (comment présenter), <strong>Contraintes</strong> (limites et interdictions). Cette structure force la clarté et réduit l\'ambiguïté. Un agent bien structuré est un agent prévisible.' },
       { name: 'Instructions négatives (guardrails)',
         from: 'Prompt engineering',
-        detail: 'Les interdictions explicites (<code>"Ne fais JAMAIS X"</code>) sont <strong>plus efficaces que les souhaits positifs</strong>. L\'agent LLM a tendance à interpréter les instructions positives avec flexibilité, mais respecte les interdictions strictes. Utilisez des mots forts : <code>JAMAIS</code>, <code>NE PAS</code>, <code>INTERDIT</code>, <code>TOUJOURS</code>.' },
+        detail: 'Les interdictions explicites (<code>"Ne fais JAMAIS X"</code>) sont <strong>souvent plus efficaces que les souhaits positifs</strong>. L\'agent LLM a tendance à interpréter les instructions positives avec flexibilité, mais respecte les interdictions strictes. Utilisez des mots forts : <code>JAMAIS</code>, <code>NE PAS</code>, <code>INTERDIT</code>, <code>TOUJOURS</code>.' },
       { name: 'Exemples dans les instructions (few-shot)',
         from: 'Prompt engineering',
         detail: 'Inclure un <strong>exemple concret de sortie attendue</strong> dans les instructions. C\'est le pattern "few-shot" : l\'agent imite le format de l\'exemple. Un exemple vaut 100 mots d\'explication. Montrez exactement le format, le niveau de détail, et le ton attendus.' },
@@ -531,7 +531,10 @@ const EXERCISES = [
         detail: 'Définir un <strong>template de sortie</strong> que l\'agent doit suivre exactement. Au lieu de "fais un résumé", donnez le squelette : <code>"## Titre\\n- Point 1\\n- Point 2\\n## Actions"</code>. L\'agent remplit le template au lieu d\'inventer un format — résultat plus cohérent et prévisible.' },
       { name: 'Méthodologie de test',
         from: 'Prompt engineering',
-        detail: 'Approche scientifique du prompt engineering : <strong>(1)</strong> Baseline — tester l\'état actuel, <strong>(2)</strong> Hypothèse — identifier un point d\'amélioration, <strong>(3)</strong> Modification — changer UNE variable, <strong>(4)</strong> Test — vérifier dans Chat, <strong>(5)</strong> Itérer. Changez une seule chose à la fois pour savoir ce qui fait la différence.' }
+        detail: 'Approche scientifique du prompt engineering : <strong>(1)</strong> Baseline — tester l\'état actuel, <strong>(2)</strong> Hypothèse — identifier un point d\'amélioration, <strong>(3)</strong> Modification — changer UNE variable, <strong>(4)</strong> Test — vérifier dans Chat, <strong>(5)</strong> Itérer. Changez une seule chose à la fois pour savoir ce qui fait la différence.' },
+      { name: 'Version history',
+        from: 'Custom Agent',
+        detail: 'Les Custom Agents disposent d\'un <strong>historique de versions</strong>. Vous pouvez consulter les configurations passées de votre agent et les restaurer si nécessaire. C\'est un filet de sécurité essentiel pour le processus itératif : expérimentez librement dans vos instructions, vous pourrez toujours revenir en arrière si une modification dégrade les résultats.' }
     ],
     shared: []
   }

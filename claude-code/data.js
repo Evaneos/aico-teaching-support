@@ -15,7 +15,7 @@ const EXERCISES = [
     ],
     steps: [
       { instruction: 'Vérifiez votre version de Node.js (>= 18 requis)', expected: 'Un numéro de version s\'affiche, ex: v20.11.0', copyable: 'node --version' },
-      { instruction: 'Installez Claude Code via npm', expected: 'Installation terminée sans erreur', copyable: 'npm install -g @anthropic-ai/claude-code' },
+      { instruction: 'Installez Claude Code via le script officiel (ou Homebrew)', expected: 'Installation terminée sans erreur', copyable: 'curl -fsSL https://claude.ai/install.sh | bash' },
       { instruction: 'Vérifiez que Claude Code est bien installé', expected: 'Le numéro de version de Claude Code s\'affiche', copyable: 'claude --version' },
       { instruction: 'Créez un répertoire de travail pour le hackathon et lancez Claude Code dedans', expected: 'L\'interface interactive de Claude Code s\'ouvre dans votre terminal', copyable: 'mkdir -p ~/hackathon-pitStop && cd ~/hackathon-pitStop && claude' },
       { instruction: 'Demandez à Claude de vous décrire le répertoire courant', expected: 'Claude analyse les fichiers présents (ou note que le dossier est vide) et décrit le contexte', copyable: 'Décris-moi ce que contient ce répertoire. Si c\'est vide, propose-moi ce qu\'on pourrait y construire.' },
@@ -41,7 +41,9 @@ const EXERCISES = [
         detail: 'Claude maintient le contexte de toute la conversation en cours. Chaque message s\'ajoute à l\'historique — il se souvient de ce que vous avez dit et de ce qu\'il a fait. Le contexte est perdu quand vous quittez la session (sauf avec la mémoire, voir exercice 04).' }
     ],
     code: `# Installer Claude Code
-npm install -g @anthropic-ai/claude-code
+curl -fsSL https://claude.ai/install.sh | bash
+# Ou via Homebrew :
+# brew install --cask claude-code
 
 # Lancer dans un répertoire de travail
 mkdir -p ~/hackathon-pitStop && cd ~/hackathon-pitStop
@@ -69,9 +71,9 @@ claude
     ],
     steps: [
       { instruction: 'Lancez Claude Code dans votre répertoire hackathon', expected: 'La session interactive s\'ouvre', copyable: 'cd ~/hackathon-pitStop && claude' },
-      { instruction: 'Ajoutez le marketplace officiel de plugins', expected: 'Le marketplace est ajouté à la configuration, un message de confirmation s\'affiche', copyable: '/plugin marketplace add https://marketplace.claudecode.dev' },
-      { instruction: 'Parcourez les plugins disponibles dans le marketplace', expected: 'Une liste de plugins s\'affiche avec leurs descriptions', copyable: '/plugin search' },
-      { instruction: 'Installez le plugin "superpowers" (brainstorming, planning, debugging, review, TDD)', expected: 'Le plugin est téléchargé et ses skills sont disponibles', copyable: '/plugin install superpowers' },
+      { instruction: 'Ajoutez le marketplace superpowers', expected: 'Le marketplace est ajouté à la configuration, un message de confirmation s\'affiche', copyable: '/plugin marketplace add obra/superpowers-marketplace' },
+      { instruction: 'Parcourez les plugins disponibles via la commande install', expected: 'Une liste de plugins s\'affiche avec leurs descriptions', copyable: '/plugin install' },
+      { instruction: 'Installez le plugin "superpowers" (brainstorming, planning, debugging, review, TDD)', expected: 'Le plugin est téléchargé et ses skills sont disponibles', copyable: '/plugin install obra/superpowers' },
       { instruction: 'Listez toutes les skills maintenant disponibles', expected: 'La liste inclut les skills superpowers : brainstorm, debug, review, plan, verify, tdd', copyable: '/skills' },
       { instruction: 'Explorez la description d\'une skill pour comprendre ce qu\'elle fait', expected: 'Vous voyez le détail de la skill : quand elle s\'active, ce qu\'elle change dans le comportement de Claude', copyable: 'Décris-moi en détail ce que fait la skill brainstorm et comment elle change ton comportement' },
       { instruction: 'Vérifiez l\'état de vos plugins installés', expected: 'La liste des plugins installés s\'affiche avec leur version et statut', copyable: '/plugin list' }
@@ -79,13 +81,10 @@ claude
     apis: [
       { name: '/plugin marketplace add',
         from: 'commande interactive',
-        detail: 'Ajoute une <strong>source de plugins</strong> (marketplace). Un marketplace est un registre distant qui liste des plugins disponibles. Une fois ajouté, vous pouvez parcourir et installer ses plugins. L\'URL officielle : <code>https://marketplace.claudecode.dev</code>.' },
+        detail: 'Ajoute une <strong>source de plugins</strong> (marketplace). Un marketplace est un registre distant qui liste des plugins disponibles. Une fois ajouté, vous pouvez parcourir et installer ses plugins. Exemple : <code>/plugin marketplace add obra/superpowers-marketplace</code>.' },
       { name: '/plugin install',
         from: 'commande interactive',
-        detail: 'Installe un plugin depuis un marketplace configuré. Le plugin est téléchargé et ses <strong>skills et serveurs MCP</strong> sont enregistrés. Syntaxe : <code>/plugin install nom-du-plugin</code>. Les nouvelles capacités sont disponibles immédiatement.' },
-      { name: '/plugin search',
-        from: 'commande interactive',
-        detail: 'Parcourt les plugins disponibles dans les marketplaces configurés. Affiche le nom, la description et la version de chaque plugin. Permet de découvrir de nouvelles capacités avant de les installer.' },
+        detail: 'Installe un plugin depuis un marketplace configuré. Sans argument, <strong>affiche les plugins disponibles</strong> pour naviguer et choisir. Avec un argument, installe directement : <code>/plugin install obra/superpowers</code>. Les nouvelles capacités sont disponibles immédiatement.' },
       { name: '/skills',
         from: 'commande interactive',
         detail: 'Liste toutes les <strong>skills disponibles</strong> dans la session courante — celles installées via plugins et celles définies localement. Chaque skill a un nom, une description, et un trigger d\'activation. C\'est votre inventaire de "modes de pensée".' },
@@ -93,14 +92,14 @@ claude
         from: 'concept',
         detail: 'Distinction fondamentale : les <strong>skills</strong> sont des instructions en langage naturel qui changent <em>comment</em> Claude réfléchit (brainstorm, review, debug). Les <strong>serveurs MCP</strong> sont des services qui donnent à Claude de nouveaux <em>outils</em> pour agir (lire Notion, poster sur Slack, créer des PRs GitHub). Un plugin peut contenir les deux.' }
     ],
-    code: `# Ajouter le marketplace officiel
-/plugin marketplace add https://marketplace.claudecode.dev
+    code: `# Ajouter le marketplace superpowers
+/plugin marketplace add obra/superpowers-marketplace
 
 # Parcourir les plugins disponibles
-/plugin search
+/plugin install
 
 # Installer superpowers (brainstorm, debug, review, plan, TDD)
-/plugin install superpowers
+/plugin install obra/superpowers
 
 # Voir toutes les skills disponibles
 /skills
@@ -126,7 +125,7 @@ claude
       'Ce pattern "l\'agent guide, l\'humain valide" est <strong>le futur du travail assisté par IA</strong>. L\'agent structure la réflexion, vous apportez l\'expertise métier et les décisions.'
     ],
     steps: [
-      { instruction: 'Lancez une session de brainstorming sur un sujet concret', expected: 'Claude entre en mode brainstorming : il pose une première question de clarification au lieu de répondre directement', copyable: '/brainstorm Comment pourrait-on améliorer l\'expérience de recherche de voyage sur Evaneos ?' },
+      { instruction: 'Lancez une session de brainstorming sur un sujet concret', expected: 'Claude entre en mode brainstorming : il pose une première question de clarification au lieu de répondre directement', copyable: '/superpowers:brainstorming Comment pourrait-on améliorer l\'expérience de recherche de voyage sur Evaneos ?' },
       { instruction: 'Répondez à la question de clarification de Claude', expected: 'Claude pose une deuxième question pour affiner sa compréhension — il ne propose pas encore de solutions', copyable: 'On veut surtout améliorer le taux de conversion sur la page de résultats. Les utilisateurs semblent perdus quand il y a trop d\'options.' },
       { instruction: 'Laissez Claude passer en phase de divergence', expected: 'Claude propose plusieurs pistes d\'amélioration organisées par thèmes, sans les juger', copyable: 'OK, je pense que tu as assez de contexte. Propose-moi des pistes.' },
       { instruction: 'Demandez à Claude de converger et prioriser', expected: 'Claude organise les idées par impact/effort et recommande un plan d\'action priorisé', copyable: 'Très bien. Maintenant aide-moi à prioriser ces idées par impact et facilité de mise en œuvre.' },
@@ -134,7 +133,7 @@ claude
       { instruction: 'Comparez avec une conversation sans skill : posez la même question directement', expected: 'Sans la skill, Claude répond d\'un bloc avec des suggestions génériques — pas de questions, pas de phases, pas de structure', copyable: 'Oublie le brainstorming précédent. Réponds directement : comment améliorer l\'expérience de recherche de voyage ?' }
     ],
     apis: [
-      { name: '/brainstorm',
+      { name: '/superpowers:brainstorming',
         from: 'skill superpowers',
         detail: 'Active le mode <strong>brainstorming structuré</strong>. Claude suit un flow en phases : clarification → divergence → convergence → synthèse. Il pose des questions une par une, ne saute pas aux solutions, et produit un livrable structuré. C\'est un exemple concret de skill qui change le <em>mode de pensée</em>, pas les outils.' },
       { name: 'Flow en phases',
@@ -142,13 +141,13 @@ claude
         detail: 'Le brainstorming suit un <strong>processus en 4 phases</strong> : <strong>1) Clarification</strong> — questions pour comprendre le vrai problème. <strong>2) Divergence</strong> — génération d\'idées sans jugement. <strong>3) Convergence</strong> — tri, priorisation, matrice impact/effort. <strong>4) Synthèse</strong> — document structuré avec plan d\'action.' },
       { name: 'Skill behavior change',
         from: 'concept',
-        detail: 'Une skill modifie le <strong>system prompt dynamiquement</strong>. Quand <code>/brainstorm</code> est activé, des instructions supplémentaires sont injectées : "pose des questions avant de répondre", "sépare divergence et convergence", etc. Le même modèle, les mêmes outils — mais un comportement radicalement différent.' },
+        detail: 'Une skill modifie le <strong>system prompt dynamiquement</strong>. Quand <code>/superpowers:brainstorming</code> est activé, des instructions supplémentaires sont injectées : "pose des questions avant de répondre", "sépare divergence et convergence", etc. Le même modèle, les mêmes outils — mais un comportement radicalement différent.' },
       { name: 'Résultat fichier',
         from: 'pattern',
         detail: 'Le brainstorming peut produire un <strong>fichier markdown structuré</strong> comme livrable. Claude utilise l\'outil <code>Write</code> pour créer le fichier dans le working directory. Ce fichier est versionnable, partageable, et réutilisable dans les exercices suivants.' }
     ],
     code: `# Lancer un brainstorming structuré
-/brainstorm Comment améliorer l'onboarding des nouveaux développeurs ?
+/superpowers:brainstorming Comment améliorer l'onboarding des nouveaux développeurs ?
 
 # Phase 1 — Claude pose des questions de clarification
 # → "Combien de nouveaux devs par mois ?"
@@ -183,20 +182,23 @@ claude
       { instruction: 'Créez un fichier CLAUDE.md à la racine de votre répertoire hackathon', expected: 'Le fichier est créé avec des conventions claires', copyable: 'cat > ~/hackathon-pitStop/CLAUDE.md << \'EOF\'\n# Conventions PIT STOP Hackathon\n\n## Contexte\nCe répertoire contient les expérimentations du hackathon PIT STOP d\'Evaneos.\n\n## Règles\n- Écrire tous les messages et commentaires en français\n- Nommer les fichiers en kebab-case (ex: mon-fichier.md)\n- Toujours ajouter un header avec la date dans les fichiers markdown\n- Ne JAMAIS supprimer de fichiers sans confirmation explicite\n\n## Stack préférée\n- TypeScript pour le code\n- Markdown pour la documentation\n- JSON pour les données\nEOF' },
       { instruction: 'Lancez Claude Code et vérifiez qu\'il charge le CLAUDE.md', expected: 'Claude mentionne avoir lu le CLAUDE.md et connaît les conventions du projet', copyable: 'cd ~/hackathon-pitStop && claude\n> Quelles sont les conventions de ce projet ?' },
       { instruction: 'Testez que Claude respecte les conventions', expected: 'Claude nomme le fichier en kebab-case, écrit en français, et ajoute un header avec la date', copyable: 'Crée un fichier avec une liste de courses pour le déjeuner d\'équipe' },
-      { instruction: 'Explorez le dossier .claude/ pour voir la mémoire locale', expected: 'Vous voyez les fichiers de mémoire et de configuration dans .claude/', copyable: 'ls -la ~/.claude/ && echo "---" && ls -la .claude/ 2>/dev/null || echo "Pas encore de .claude/ local"' },
+      { instruction: 'Explorez le dossier de mémoire auto et la config locale', expected: 'Vous voyez les fichiers de mémoire dans ~/.claude/projects/ et la config dans .claude/', copyable: 'ls -la ~/.claude/projects/ 2>/dev/null && echo "---" && ls -la .claude/ 2>/dev/null || echo "Pas encore de .claude/ local"' },
       { instruction: 'Donnez un feedback à Claude pour enrichir sa mémoire', expected: 'Claude enregistre le feedback et l\'appliquera dans les futures conversations', copyable: 'Rappelle-toi : dans ce projet, je préfère les listes numérotées aux listes à puces. Retiens ça pour nos futures conversations.' },
       { instruction: 'Vérifiez que la mémoire a été mise à jour', expected: 'La mémoire contient votre préférence de listes numérotées', copyable: 'Qu\'est-ce que tu as retenu de mes préférences ?' }
     ],
     apis: [
       { name: 'CLAUDE.md',
         from: 'fichier de configuration',
-        detail: 'Fichier markdown à la <strong>racine du projet</strong>, lu automatiquement par Claude au début de chaque conversation. Contient les conventions, l\'architecture, les interdictions, les patterns préférés. C\'est l\'équivalent d\'un <strong>system prompt persistant</strong> lié au projet. Chaque projet peut avoir son propre CLAUDE.md.' },
+        detail: 'Fichier markdown à la <strong>racine du projet</strong> (ou dans <code>.claude/CLAUDE.md</code>), lu automatiquement par Claude au début de chaque conversation. Contient les conventions, l\'architecture, les interdictions, les patterns préférés. C\'est l\'équivalent d\'un <strong>system prompt persistant</strong> lié au projet. Utilisez <code>/init</code> pour en auto-générer un en analysant le codebase.' },
       { name: '.claude/',
         from: 'répertoire de configuration',
-        detail: 'Répertoire contenant les fichiers de <strong>mémoire et configuration</strong> locaux au projet. Claude y stocke ce qu\'il apprend au fil des conversations — feedback reçu, décisions prises, contexte accumulé. Ce répertoire peut être versionné (git) pour partager la mémoire avec l\'équipe.' },
+        detail: 'Répertoire contenant les fichiers de <strong>configuration</strong> locaux au projet (settings.json, skills). La mémoire auto de Claude est stockée dans <code>~/.claude/projects/&lt;project&gt;/memory/</code> (machine-local, pas dans le repo). Le répertoire <code>.claude/</code> peut être versionné (git) pour partager skills et config avec l\'équipe.' },
       { name: 'Types de mémoire',
         from: 'concept',
-        detail: 'Quatre niveaux de mémoire : <strong>1) Utilisateur</strong> (<code>~/.claude/</code>) — préférences globales qui s\'appliquent partout. <strong>2) Projet</strong> (<code>.claude/</code>) — contexte spécifique au projet. <strong>3) CLAUDE.md</strong> — conventions et règles du projet. <strong>4) Conversation</strong> — contexte de la session en cours, perdu à la fermeture.' },
+        detail: 'Quatre niveaux de mémoire : <strong>1) Utilisateur</strong> (<code>~/.claude/</code>) — préférences globales qui s\'appliquent partout. <strong>2) Projet auto</strong> (<code>~/.claude/projects/&lt;project&gt;/memory/</code>) — mémoire machine-locale. <strong>3) CLAUDE.md</strong> — conventions et règles du projet (racine ou <code>.claude/CLAUDE.md</code>). <strong>4) Conversation</strong> — contexte de la session en cours, perdu à la fermeture.' },
+      { name: '/init',
+        from: 'commande interactive',
+        detail: 'Auto-génère un fichier <strong>CLAUDE.md</strong> en analysant le codebase existant. Claude parcourt la structure du projet, détecte les conventions, la stack, et produit un CLAUDE.md pré-rempli. Un excellent point de départ à personnaliser ensuite.' },
       { name: '/memory',
         from: 'commande interactive',
         detail: 'Permet de consulter et gérer la mémoire de Claude. Vous pouvez voir ce qu\'il a retenu, corriger des informations erronées, ou effacer des souvenirs obsolètes. La mémoire est <strong>transparente et contrôlable</strong> — pas de boîte noire.' }
@@ -219,9 +221,10 @@ claude
 - Ne pas ajouter de dépendances sans validation humaine
 
 ## Mémoire
-# ~/.claude/        → préférences globales (tous projets)
-# .claude/          → mémoire projet (ce repo)
-# CLAUDE.md         → conventions projet (lu au démarrage)`,
+# ~/.claude/                          → préférences globales (tous projets)
+# ~/.claude/projects/<project>/memory/ → mémoire auto (machine-locale)
+# CLAUDE.md ou .claude/CLAUDE.md      → conventions projet (lu au démarrage)
+# /init                               → auto-génère un CLAUDE.md`,
     prereqs: ['01'],
     shared: [
       { concept: 'CLAUDE.md', targets: ['06'] },
@@ -230,7 +233,7 @@ claude
   },
   {
     id: '05', section: 'trunk', title: 'Git Workflow Assisté', layer: 'basics', done: true, jourJ: false,
-    concepts: 'git, /commit, branches, PR, GitHub plugin',
+    concepts: 'git, commit assisté, branches, PR, GitHub plugin',
     insights: [
       'Claude lit votre <strong>git log pour imiter votre style de commit</strong>. Il ne s\'invente pas de conventions — il suit les vôtres. Si vos commits sont en français avec des emojis, les siens le seront aussi.',
       'Le workflow complet branch → commit → PR <strong>sans quitter le terminal</strong> réduit le context-switching. Vous restez dans le flow de pensée au lieu de jongler entre terminal, IDE et navigateur.',
@@ -240,15 +243,15 @@ claude
       { instruction: 'Initialisez un repo git dans votre répertoire hackathon', expected: 'Un repo git est créé avec un premier commit', copyable: 'cd ~/hackathon-pitStop && git init && git add -A && git commit -m "Initial commit: hackathon PIT STOP"' },
       { instruction: 'Demandez à Claude de créer une branche feature', expected: 'Claude crée la branche et bascule dessus', copyable: 'Crée une branche feature/amelioration-recherche et bascule dessus' },
       { instruction: 'Faites des modifications via Claude', expected: 'Claude crée ou modifie des fichiers pertinents', copyable: 'Crée un fichier recherche-v2.md avec les 3 améliorations principales qu\'on a identifiées en brainstorming' },
-      { instruction: 'Utilisez /commit pour commiter avec un message généré', expected: 'Claude analyse les changements, propose un message de commit pertinent, et commite', copyable: '/commit' },
+      { instruction: 'Demandez à Claude de commiter vos changements en langage naturel', expected: 'Claude analyse les changements, propose un message de commit pertinent, et commite', copyable: 'Commit mes changements avec un message de commit approprié' },
       { instruction: 'Vérifiez le log git pour voir le commit', expected: 'Le commit apparaît avec un message bien formaté qui suit vos conventions', copyable: 'git log --oneline -5' },
       { instruction: 'Demandez à Claude de préparer une Pull Request (si le repo a un remote GitHub)', expected: 'Claude génère un titre et une description de PR basés sur les changements de la branche', copyable: 'Prépare une Pull Request pour cette branche. Génère un titre et une description détaillée des changements.' },
       { instruction: 'Revenez sur la branche principale', expected: 'Vous êtes de retour sur main/master', copyable: 'git checkout main || git checkout master' }
     ],
     apis: [
-      { name: '/commit',
-        from: 'commande interactive',
-        detail: 'Analyse les fichiers modifiés (staged et unstaged), génère un <strong>message de commit</strong> qui suit le style de votre git log existant, et effectue le commit. Claude détecte automatiquement les conventions : Conventional Commits, emojis, langue, longueur. Vous pouvez accepter, modifier ou refuser le message.' },
+      { name: 'Commit en langage naturel',
+        from: 'capacité native',
+        detail: 'Il n\'y a pas de commande <code>/commit</code> native. Demandez simplement en langage naturel : <strong>"Commit mes changements"</strong>. Claude analyse les fichiers modifiés (staged et unstaged), génère un <strong>message de commit</strong> qui suit le style de votre git log existant, et effectue le commit via les outils git. Vous pouvez aussi utiliser <code>/superpowers:verification-before-completion</code> avant de commiter pour vérifier le travail.' },
       { name: 'GitHub plugin',
         from: 'plugin anthropics/github',
         detail: 'Plugin officiel qui donne à Claude des outils pour interagir avec GitHub : <strong>créer des branches</strong>, <strong>ouvrir des PRs</strong>, <strong>gérer des issues</strong>, commenter du code. Transforme Claude en assistant GitHub complet sans quitter le terminal.' },
@@ -257,7 +260,7 @@ claude
         detail: 'Claude a accès au <strong>contexte git complet</strong> : status, diff, log, branches, remotes. Il utilise ces informations pour comprendre l\'état du repo et proposer des actions pertinentes. C\'est pourquoi ses messages de commit sont bons — il voit le <em>diff</em>, pas juste les noms de fichiers.' },
       { name: 'Branch workflow',
         from: 'pattern',
-        detail: 'Le pattern recommandé : <strong>1)</strong> Créer une branche feature. <strong>2)</strong> Travailler avec Claude dessus. <strong>3)</strong> Commiter avec <code>/commit</code>. <strong>4)</strong> Ouvrir une PR avec le plugin GitHub. Tout depuis la même session Claude — zéro context-switching.' }
+        detail: 'Le pattern recommandé : <strong>1)</strong> Créer une branche feature. <strong>2)</strong> Travailler avec Claude dessus. <strong>3)</strong> Demander "Commit mes changements" en langage naturel. <strong>4)</strong> Ouvrir une PR avec le plugin GitHub. Tout depuis la même session Claude — zéro context-switching.' }
     ],
     code: `# Initialiser un repo
 git init && git add -A && git commit -m "Initial commit"
@@ -265,8 +268,11 @@ git init && git add -A && git commit -m "Initial commit"
 # Demander à Claude de gérer le workflow git
 > Crée une branche feature/search-improvements
 > [... faire des modifications ...]
-> /commit
-# → Claude analyse le diff et propose un message
+> Commit mes changements avec un message approprié
+# → Claude analyse le diff et propose un message via git
+
+# Optionnel : vérifier avant de commiter
+> /superpowers:verification-before-completion
 
 # Vérifier le résultat
 git log --oneline -5
@@ -301,7 +307,7 @@ git log --oneline -5
     apis: [
       { name: 'SKILL.md frontmatter',
         from: 'convention Claude Code',
-        detail: 'Le frontmatter YAML en tête du fichier définit les métadonnées : <code>name</code> (identifiant en minuscules avec tirets) et <code>description</code> (phrase courte décrivant quand utiliser la skill). Ces métadonnées sont injectées dans le <strong>system prompt</strong> — le corps du fichier n\'est chargé que quand la skill est activée.' },
+        detail: 'Le frontmatter YAML en tête du fichier définit les métadonnées : <code>name</code> (identifiant en minuscules avec tirets), <code>description</code> (phrase courte — c\'est ce que Claude utilise pour décider quand activer la skill via <strong>progressive disclosure</strong>), et <code>user-invocable: true</code> pour les skills invocables comme slash-command (<code>/skillname</code>). Seule la <code>description</code> est injectée dans le system prompt — le corps du fichier n\'est chargé que quand la skill est réellement activée.' },
       { name: 'Activation triggers',
         from: 'concept',
         detail: 'La section "Quand activer" du SKILL.md guide le modèle pour reconnaître les situations pertinentes. C\'est la partie la plus critique : <strong>trop large</strong> et la skill se déclenche à tort, <strong>trop étroit</strong> et elle n\'est jamais activée. Listez des mots-clés et des formulations variées.' },
@@ -353,7 +359,7 @@ Quand l'utilisateur partage des notes de réunion...
       'Les MCP servers suivent un <strong>protocole standard ouvert</strong>. N\'importe quel service peut exposer ses capacités à Claude via MCP. C\'est le USB-C des agents IA — un connecteur universel.'
     ],
     steps: [
-      { instruction: 'Installez le plugin Notion pour Claude Code', expected: 'Le plugin Notion est installé avec ses outils MCP (lecture, écriture, recherche)', copyable: '/plugin install notion' },
+      { instruction: 'Installez le plugin Notion pour Claude Code', expected: 'Le plugin Notion est installé avec ses outils MCP (lecture, écriture, recherche)', copyable: '/plugin install makenotion/claude-code-notion-plugin' },
       { instruction: 'Listez les nouveaux outils disponibles après installation', expected: 'Vous voyez les outils Notion : notion-search, notion-fetch, notion-create-pages, etc.', copyable: 'Quels nouveaux outils as-tu maintenant que le plugin Notion est installé ? Liste-les tous.' },
       { instruction: 'Recherchez une page dans votre workspace Notion', expected: 'Claude utilise l\'outil notion-search pour trouver des pages', copyable: 'Cherche dans Notion les pages qui parlent de "roadmap" ou "planning"' },
       { instruction: 'Lisez et résumez une page Notion', expected: 'Claude lit le contenu de la page et en fait un résumé structuré', copyable: 'Lis la page Notion que tu viens de trouver et fais-moi un résumé en 5 bullets des points clés' },
@@ -375,7 +381,7 @@ Quand l'utilisateur partage des notes de réunion...
         detail: 'Distinction clé : <strong>Skills</strong> = instructions markdown qui changent comment Claude <em>pense</em> (brainstorm, review, debug). <strong>MCP Servers</strong> = services qui donnent à Claude de nouveaux <em>outils</em> pour <em>agir</em> (lire Notion, poster Slack). Un plugin peut bundler les deux ensemble.' }
     ],
     code: `# Installer le plugin Notion
-/plugin install notion
+/plugin install makenotion/claude-code-notion-plugin
 
 # Les outils MCP sont disponibles immédiatement
 > Cherche dans Notion les pages sur la roadmap
@@ -411,8 +417,8 @@ Quand l'utilisateur partage des notes de réunion...
       { instruction: 'Comprenez le concept de subagents en demandant à Claude de l\'expliquer', expected: 'Claude explique les subagents : dispatch, isolation, parallélisme, synthèse', copyable: 'Explique-moi le concept de subagents. Quand les utiliser, comment ils fonctionnent, et quels sont leurs avantages par rapport au travail séquentiel ?' },
       { instruction: 'Lancez une recherche parallèle avec des subagents', expected: 'Claude dispatche plusieurs subagents qui travaillent en parallèle', copyable: 'Utilise des subagents en parallèle pour : 1) Analyser la structure de fichiers de ce répertoire 2) Lister les bonnes pratiques de documentation de projet 3) Suggérer une structure de dossiers idéale pour un projet hackathon' },
       { instruction: 'Observez la synthèse des résultats', expected: 'Claude combine les résultats des 3 subagents en une recommandation cohérente', copyable: 'Synthétise les résultats de ces 3 analyses en un plan d\'action concret' },
-      { instruction: 'Lancez un subagent de type "researcher" pour explorer un sujet', expected: 'Le subagent explorer un sujet en profondeur pendant que vous continuez à travailler', copyable: 'Lance un subagent researcher pour explorer les meilleures pratiques de n8n workflows pendant que je continue à travailler ici' },
-      { instruction: 'Testez les limites : un subagent qui modifie des fichiers', expected: 'Le subagent peut créer et modifier des fichiers dans le working directory', copyable: 'Lance un subagent pour créer une structure de projet complète dans un sous-dossier "demo/" avec README, src/, tests/, et des exemples de code' },
+      { instruction: 'Lancez un subagent de type "Plan" pour explorer un sujet en profondeur', expected: 'Le subagent explore un sujet en profondeur pendant que vous continuez à travailler', copyable: 'Lance un subagent de recherche pour explorer les meilleures pratiques de n8n workflows pendant que je continue à travailler ici' },
+      { instruction: 'Testez les limites : un subagent general-purpose qui modifie des fichiers', expected: 'Le subagent peut créer et modifier des fichiers dans le working directory', copyable: 'Lance un subagent pour créer une structure de projet complète dans un sous-dossier "demo/" avec README, src/, tests/, et des exemples de code' },
       { instruction: 'Demandez à Claude de comparer les résultats de multiples subagents', expected: 'Claude compare et contraste les analyses de chaque subagent', copyable: 'Lance 2 subagents en parallèle : un qui argumente POUR une architecture microservices, et un qui argumente POUR un monolithe. Puis compare leurs arguments.' }
     ],
     apis: [
@@ -422,9 +428,9 @@ Quand l'utilisateur partage des notes de réunion...
       { name: 'run_in_background',
         from: 'paramètre Agent tool',
         detail: 'Lance le subagent <strong>en arrière-plan</strong>. L\'agent principal continue de travailler pendant que le subagent exécute sa tâche. Les résultats sont récupérés quand le subagent termine. Permet une véritable <strong>exécution parallèle</strong> — 3 recherches en même temps au lieu de 3 séquentielles.' },
-      { name: 'subagent_type',
+      { name: 'Types de subagents',
         from: 'paramètre Agent tool',
-        detail: 'Définit le type de subagent : <strong>researcher</strong> (explore, lit, analyse), <strong>coder</strong> (écrit et modifie du code), <strong>reviewer</strong> (vérifie et critique). Le type influence le comportement du subagent — sa "spécialisation".' },
+        detail: 'Trois types built-in : <strong>Explore</strong> (lecture seule, rapide — idéal pour chercher dans le code), <strong>Plan</strong> (recherche approfondie — analyse et planification), <strong>general-purpose</strong> (accès complet aux outils — peut lire, écrire, exécuter). Le type détermine les outils disponibles et les permissions du subagent.' },
       { name: 'Isolation de contexte',
         from: 'concept',
         detail: 'Chaque subagent a son <strong>propre contexte de conversation</strong>, séparé de l\'agent principal et des autres subagents. Il ne voit que sa description de tâche. Avantage : pas de pollution croisée. Inconvénient : il ne peut pas poser de questions à l\'utilisateur — il doit être autonome.' }
@@ -440,11 +446,16 @@ Quand l'utilisateur partage des notes de réunion...
 # En interne, Claude utilise :
 # Agent tool × 3, chacun avec run_in_background: true
 
-# Subagent de recherche en background
-> Lance un researcher pour explorer les best practices n8n
+# Types de subagents :
+# Explore       → lecture seule, rapide (recherche dans le code)
+# Plan          → recherche approfondie (analyse, planification)
+# general-purpose → accès complet (lecture, écriture, exécution)
+
+# Subagent Plan en background
+> Lance un subagent pour explorer les best practices n8n
 # → Le subagent travaille pendant que vous continuez
 
-# Subagent de modification
+# Subagent general-purpose pour modifications
 > Lance un subagent pour créer la structure demo/
 # → Le subagent crée les fichiers de manière autonome
 
@@ -470,16 +481,16 @@ Quand l'utilisateur partage des notes de réunion...
       { instruction: 'Examinez et validez le plan proposé', expected: 'Claude présente un plan détaillé avec des étapes numérotées et attend votre validation', copyable: 'Le plan est bon, mais ajoute une étape de tests pour vérifier que tous les liens fonctionnent. Aussi, commence par la structure des dossiers avant le contenu.' },
       { instruction: 'Lancez l\'exécution du plan validé', expected: 'Claude exécute le plan étape par étape, potentiellement avec des subagents pour les tâches parallèles', copyable: 'OK, exécute ce plan. Pour les étapes indépendantes, utilise des subagents en parallèle.' },
       { instruction: 'Observez un checkpoint de review pendant l\'exécution', expected: 'Claude s\'arrête à un point de décision et vous demande de valider avant de continuer', copyable: 'Continue l\'exécution. Si tu arrives à un choix de design ou une décision d\'architecture, demande-moi avant de continuer.' },
-      { instruction: 'Demandez une vérification du travail accompli', expected: 'Claude lance une phase de vérification et liste ce qui est fait vs ce qui reste', copyable: '/verify Vérifie que le plan a été correctement exécuté. Liste ce qui est terminé, ce qui reste, et les éventuels problèmes.' },
+      { instruction: 'Demandez une vérification du travail accompli', expected: 'Claude lance une phase de vérification et liste ce qui est fait vs ce qui reste', copyable: '/superpowers:verification-before-completion Vérifie que le plan a été correctement exécuté. Liste ce qui est terminé, ce qui reste, et les éventuels problèmes.' },
       { instruction: 'Faites un retour sur la qualité de l\'exécution', expected: 'Claude prend en compte le feedback pour les futures exécutions', copyable: 'La structure est bonne mais les fichiers HTML sont trop basiques. La prochaine fois, utilise un template plus riche avec du CSS inline.' }
     ],
     apis: [
-      { name: 'Plan mode',
+      { name: '/plan',
+        from: 'commande built-in Claude Code',
+        detail: 'Commande <strong>native</strong> de Claude Code qui active le mode planification. Claude décompose une tâche complexe en étapes ordonnées, identifie les dépendances, et propose un plan structuré. L\'exécution ne commence qu\'après votre validation. Les skills <code>/superpowers:writing-plans</code> et <code>/superpowers:executing-plans</code> enrichissent ce mode.' },
+      { name: '/superpowers:verification-before-completion',
         from: 'skill superpowers',
-        detail: 'Mode où Claude <strong>planifie avant d\'exécuter</strong>. Il décompose une tâche complexe en étapes ordonnées, identifie les dépendances entre étapes, et propose un plan structuré. L\'exécution ne commence qu\'après votre validation. Permet de garder le contrôle sur les tâches complexes.' },
-      { name: '/verify',
-        from: 'skill superpowers',
-        detail: 'Lance une <strong>phase de vérification</strong> post-exécution. Claude revérifie le travail accompli, compare avec le plan initial, liste les écarts, et identifie les problèmes. C\'est le "code review" de l\'exécution — un filet de sécurité automatique.' },
+        detail: 'Lance une <strong>phase de vérification</strong> post-exécution. Claude revérifie le travail accompli, compare avec le plan initial, liste les écarts, et identifie les problèmes. C\'est le "code review" de l\'exécution — un filet de sécurité automatique. Remplace l\'ancien <code>/verify</code>.' },
       { name: 'Review checkpoints',
         from: 'concept',
         detail: 'Points d\'arrêt dans l\'exécution d\'un plan où Claude <strong>demande une validation humaine</strong> avant de continuer. Configurables : à chaque étape, uniquement aux décisions critiques, ou jamais. Le bon équilibre dépend de votre confiance dans le plan et de la réversibilité des actions.' },
@@ -488,8 +499,13 @@ Quand l'utilisateur partage des notes de réunion...
         detail: 'Pattern avancé : le plan identifie les étapes <strong>parallélisables</strong>, et l\'exécution dispatche des subagents pour les étapes indépendantes. Le plan est le <em>quoi</em> et l\'<em>ordre</em>, les subagents sont le <em>comment</em> et le <em>parallélisme</em>. L\'agent principal orchestre et synthétise.' }
     ],
     code: `# Étape 1 — Planifier (sans exécuter)
+# /plan est une commande BUILT-IN de Claude Code
 > Planifie la création d'un mini-site de présentation
 # → Claude produit un plan en 6 étapes avec dépendances
+
+# Skills superpowers qui enrichissent le planning :
+# /superpowers:writing-plans   → améliore la rédaction de plans
+# /superpowers:executing-plans → améliore l'exécution de plans
 
 # Étape 2 — Valider et affiner le plan
 > Ajoute une étape de tests. Commence par la structure.
@@ -504,7 +520,7 @@ Quand l'utilisateur partage des notes de réunion...
 > Option A, avec la sidebar
 
 # Étape 5 — Vérifier
-/verify Le plan a-t-il été bien exécuté ?
+/superpowers:verification-before-completion Le plan a-t-il été bien exécuté ?
 # → Liste : ✅ fait, ⏳ en cours, ❌ manquant
 
 # Le flow complet :
@@ -519,16 +535,16 @@ Quand l'utilisateur partage des notes de réunion...
     concepts: 'hooks, settings.json, PreToolUse, PostToolUse, automatisation event-driven',
     insights: [
       'Les hooks sont le pont entre <strong>"je veux que Claude fasse toujours X"</strong> et le fait que ça arrive vraiment. Plus besoin de répéter "lance les tests après chaque modif" — le hook le fait automatiquement.',
-      'Les hooks exécutent <strong>VOS commandes shell</strong> en réponse aux actions de Claude. Ce n\'est pas de l\'IA — c\'est de l\'<strong>automatisation déterministe</strong> déclenchée par des événements IA. Fiable, prévisible, auditable.',
+      'Les hooks exécutent <strong>VOS commandes shell</strong> en réponse aux actions de Claude. Les données (nom de l\'outil, paramètres) arrivent via <strong>stdin en JSON</strong>. Ce n\'est pas de l\'IA — c\'est de l\'<strong>automatisation déterministe</strong> déclenchée par des événements IA. Fiable, prévisible, auditable.',
       'Le pattern event-driven (<code>PreToolUse</code>, <code>PostToolUse</code>) transforme Claude Code en <strong>système réactif</strong>. Chaque action de l\'agent émet un événement. Vous y attachez vos commandes. C\'est le même pattern que les git hooks — mais déclenché par l\'IA.'
     ],
     steps: [
-      { instruction: 'Comprenez les types de hooks disponibles', expected: 'Vous identifiez les hooks principaux : PreToolUse (avant), PostToolUse (après), Notification', copyable: 'Explique-moi les différents types de hooks dans Claude Code. Quand chacun se déclenche, et quelles variables d\'environnement sont disponibles ?' },
-      { instruction: 'Créez un settings.json avec un hook d\'audit (PreToolUse)', expected: 'Le hook est configuré et logge chaque action de Claude avant exécution', copyable: 'cat > ~/hackathon-pitStop/.claude/settings.json << \'EOF\'\n{\n  "hooks": {\n    "PreToolUse": [\n      {\n        "matcher": "Edit|Write",\n        "command": "echo \\"[$(date +%H:%M:%S)] WRITE: $CLAUDE_TOOL_INPUT\\" >> .claude/audit.log"\n      }\n    ]\n  }\n}\nEOF' },
+      { instruction: 'Comprenez les types de hooks disponibles', expected: 'Vous identifiez les hooks principaux : PreToolUse (avant), PostToolUse (après), Notification. Les hooks reçoivent les données via stdin en JSON.', copyable: 'Explique-moi les différents types de hooks dans Claude Code. Quand chacun se déclenche, et comment récupérer les informations via stdin JSON ?' },
+      { instruction: 'Créez un settings.json avec un hook d\'audit (PreToolUse)', expected: 'Le hook est configuré et logge chaque action de Claude avant exécution', copyable: 'cat > ~/hackathon-pitStop/.claude/settings.json << \'EOF\'\n{\n  "hooks": {\n    "PreToolUse": [\n      {\n        "matcher": "Edit|Write",\n        "hooks": [\n          {\n            "type": "command",\n            "command": "TOOL=$(cat /dev/stdin | jq -r \'.tool_name\') && echo \\"[$(date +%H:%M:%S)] WRITE: $TOOL\\" >> .claude/audit.log"\n          }\n        ]\n      }\n    ]\n  }\n}\nEOF' },
       { instruction: 'Testez le hook en demandant à Claude de modifier un fichier', expected: 'Le hook se déclenche et logge l\'action dans audit.log avant la modification', copyable: 'Crée un fichier test-hook.md avec du contenu de test' },
       { instruction: 'Vérifiez que le log d\'audit a été écrit', expected: 'Le fichier audit.log contient l\'entrée de la modification', copyable: 'cat .claude/audit.log' },
-      { instruction: 'Ajoutez un hook PostToolUse pour auto-formater après chaque modification', expected: 'Le hook de formatage est ajouté dans settings.json', copyable: 'Modifie .claude/settings.json pour ajouter un hook PostToolUse qui affiche "✓ Fichier modifié" après chaque Edit ou Write' },
-      { instruction: 'Créez un hook de garde-fou qui bloque certaines modifications', expected: 'Le hook PreToolUse retourne exit 1 pour bloquer la modification de fichiers protégés', copyable: 'Ajoute un hook PreToolUse avec le matcher "Edit|Write" qui bloque (exit 1) toute modification de fichiers dans un dossier "protected/". Crée le dossier protected/ avec un fichier dedans pour tester.' },
+      { instruction: 'Ajoutez un hook PostToolUse pour auto-formater après chaque modification', expected: 'Le hook de formatage est ajouté dans settings.json', copyable: 'Modifie .claude/settings.json pour ajouter un hook PostToolUse avec la structure imbriquée (matcher + hooks array avec type: command) qui affiche "✓ Fichier modifié" après chaque Edit ou Write' },
+      { instruction: 'Créez un hook de garde-fou qui bloque certaines modifications', expected: 'Le hook PreToolUse retourne exit 2 pour bloquer la modification de fichiers protégés', copyable: 'Ajoute un hook PreToolUse avec le matcher "Edit|Write" qui bloque (exit 2) toute modification de fichiers dans un dossier "protected/". Le hook doit lire stdin JSON avec jq pour extraire le tool_input. Crée le dossier protected/ avec un fichier dedans pour tester.' },
       { instruction: 'Testez le garde-fou en essayant de modifier un fichier protégé', expected: 'Claude est bloqué par le hook et ne peut pas modifier le fichier', copyable: 'Modifie le fichier protected/secret.md pour y ajouter du texte' },
       { instruction: 'Examinez la configuration complète de votre settings.json', expected: 'Vous voyez tous les hooks configurés avec leurs matchers et commandes', copyable: 'cat .claude/settings.json' }
     ],
@@ -538,16 +554,16 @@ Quand l'utilisateur partage des notes de réunion...
         detail: 'Fichier JSON de configuration. Deux niveaux : <code>~/.claude/settings.json</code> (global) et <code>.claude/settings.json</code> (projet). Les settings projet <strong>surchargent</strong> les settings globaux. C\'est ici que vous définissez les hooks, les permissions, et les préférences de comportement.' },
       { name: 'PreToolUse',
         from: 'type de hook',
-        detail: 'Se déclenche <strong>AVANT</strong> que Claude exécute un outil (Edit, Write, Bash...). Si la commande retourne <strong>exit 1</strong>, l\'action est <strong>bloquée</strong>. Variables disponibles : <code>$CLAUDE_TOOL_NAME</code>, <code>$CLAUDE_TOOL_INPUT</code>. Idéal pour les garde-fous et l\'audit.' },
+        detail: 'Se déclenche <strong>AVANT</strong> que Claude exécute un outil (Edit, Write, Bash...). Si la commande retourne <strong>exit 2</strong>, l\'action est <strong>bloquée</strong>. Les données (tool_name, tool_input) arrivent via <strong>stdin en JSON</strong> — utilisez <code>jq</code> pour les extraire. Idéal pour les garde-fous et l\'audit.' },
       { name: 'PostToolUse',
         from: 'type de hook',
         detail: 'Se déclenche <strong>APRÈS</strong> l\'exécution d\'un outil. Ne peut pas bloquer — l\'action est déjà faite. Idéal pour les <strong>réactions automatiques</strong> : lancer les tests, formater le code, notifier une équipe, mettre à jour un dashboard.' },
       { name: 'Hook matcher',
         from: 'paramètre',
         detail: 'Expression régulière qui filtre sur quel outil le hook se déclenche. <code>"Edit|Write"</code> matche les outils d\'édition, <code>"Bash"</code> matche les commandes shell, <code>".*"</code> matche tout. Permet de cibler précisément les actions.' },
-      { name: 'Variables d\'environnement',
+      { name: 'Structure de hooks',
         from: 'concept',
-        detail: 'Les hooks reçoivent des variables d\'environnement : <code>$CLAUDE_TOOL_NAME</code> (nom de l\'outil), <code>$CLAUDE_TOOL_INPUT</code> (paramètres de l\'outil en JSON). Ces variables permettent de <strong>filtrer et réagir</strong> de manière fine aux actions de Claude.' }
+        detail: 'Les hooks utilisent une <strong>structure imbriquée</strong> : chaque entrée a un <code>matcher</code> et un tableau <code>hooks</code>. Chaque hook dans le tableau a <code>"type": "command"</code> et <code>"command"</code>. Les données sont reçues via <strong>stdin en JSON</strong> (pas via variables d\'environnement). Seul <code>$CLAUDE_PROJECT_DIR</code> est disponible comme variable d\'environnement. Utilisez <code>jq</code> pour extraire tool_name et tool_input depuis stdin.' }
     ],
     code: `# .claude/settings.json — hooks event-driven
 
@@ -556,23 +572,41 @@ Quand l'utilisateur partage des notes de réunion...
     "PreToolUse": [
       {
         "matcher": "Edit|Write",
-        "command": "echo \\"[$(date)] $CLAUDE_TOOL_NAME\\" >> .claude/audit.log"
+        "hooks": [
+          {
+            "type": "command",
+            "command": "TOOL=$(cat /dev/stdin | jq -r '.tool_name') && echo \\"[$(date)] $TOOL\\" >> .claude/audit.log"
+          }
+        ]
       },
       {
         "matcher": "Edit|Write",
-        "command": "if echo \\"$CLAUDE_TOOL_INPUT\\" | grep -q 'protected/'; then exit 1; fi"
+        "hooks": [
+          {
+            "type": "command",
+            "command": "INPUT=$(cat /dev/stdin | jq -r '.tool_input') && echo \\"$INPUT\\" | grep -q 'protected/' && exit 2 || exit 0"
+          }
+        ]
       }
     ],
     "PostToolUse": [
       {
         "matcher": "Edit|Write",
-        "command": "npx prettier --write \\"$CLAUDE_FILE_PATH\\" 2>/dev/null"
+        "hooks": [
+          {
+            "type": "command",
+            "command": "echo '✓ Fichier modifié'"
+          }
+        ]
       }
     ]
   }
 }
 
-# PreToolUse → AVANT l'action → peut BLOQUER (exit 1)
+# Données reçues via stdin en JSON (pas des variables d'env)
+# Seul $CLAUDE_PROJECT_DIR est disponible comme env var
+# Utiliser jq pour extraire tool_name et tool_input du stdin
+# PreToolUse → AVANT l'action → peut BLOQUER (exit 2)
 # PostToolUse → APRÈS l'action → peut RÉAGIR
 # Commandes shell pures — pas d'IA, 100% déterministe`,
     prereqs: ['04'],
@@ -602,8 +636,8 @@ claude
 # Mais pas de brainstorming structuré, pas de Notion,
 # pas de GitHub avancé — juste le LLM et ses outils natifs`,
         after: `# Claude Code + Marketplace + Plugins
-/plugin marketplace add https://marketplace.claudecode.dev
-/plugin install superpowers
+/plugin marketplace add obra/superpowers-marketplace
+/plugin install obra/superpowers
 
 # Maintenant :
 /skills
@@ -633,7 +667,7 @@ claude
 # On SAIT que les skills existent
 # Mais on ne les a pas encore UTILISÉES`,
         after: `# Utiliser une skill en conversation
-/brainstorm Comment améliorer la recherche de voyage ?
+/superpowers:brainstorming Comment améliorer la recherche de voyage ?
 
 # Phase 1 — Claude POSE DES QUESTIONS (pas de réponse directe !)
 # → "Quel est le taux de conversion actuel ?"
@@ -655,7 +689,7 @@ claude
       {
         legend: '<strong>Utiliser</strong> une skill pré-installée → <strong>écrire</strong> sa propre skill — du consommateur au créateur.',
         before: `# Utiliser une skill installée via plugin
-/brainstorm Comment améliorer l'onboarding ?
+/superpowers:brainstorming Comment améliorer l'onboarding ?
 
 # Claude suit la procédure du plugin superpowers
 # Le flow est prédéfini : clarification → divergence → ...
@@ -717,7 +751,7 @@ EOF
 # → "J'ai 2 options pour le layout..."
 
 # 5. VÉRIFIER le résultat
-/verify Le plan est-il bien exécuté ?
+/superpowers:verification-before-completion Le plan est-il bien exécuté ?
 
 # Plan = la spec. Subagents = l'équipe. Vous = le PM.`,
       },

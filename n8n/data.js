@@ -32,7 +32,7 @@ const EXERCISES = [
         expected: 'Le node Webhook apparaît sur le canvas. Dans son panneau, vous voyez une <em>Test URL</em> et une <em>Production URL</em>.'
       },
       {
-        instruction: 'Ajoutez un node <strong>Edit Fields</strong> (anciennement "Set"). Connectez la sortie du Webhook à l\'entrée du Edit Fields. Ajoutez un champ <code>message</code> avec la valeur : <code>{{ "Reçu depuis le webhook : " + $json.body.text }}</code>.',
+        instruction: 'Ajoutez un node <strong>Edit Fields</strong> (anciennement "Set"). Connectez la sortie du Webhook à l\'entrée du Edit Fields. Ajoutez un champ <code>message</code> avec la valeur : <code>{{ "Reçu depuis le webhook : " + $json.text }}</code>.',
         expected: 'Le node Edit Fields est connecté au Webhook. L\'expression est visible dans le champ <em>Value</em>.'
       },
       {
@@ -54,11 +54,12 @@ const EXERCISES = [
       }
     ],
     apis: [
-      { name: 'Webhook node', from: 'n8n built-in', detail: 'Point d\'entrée HTTP pour déclencher un workflow. Expose une <strong>Test URL</strong> (active uniquement quand le workflow est ouvert et en écoute) et une <strong>Production URL</strong> (active quand le workflow est activé). Supporte <code>GET</code>, <code>POST</code>, <code>PUT</code>, <code>DELETE</code>. Les données reçues sont accessibles via <code>$json.body</code>, <code>$json.headers</code>, et <code>$json.query</code>.' },
+      { name: 'Webhook node', from: 'n8n built-in', detail: 'Point d\'entrée HTTP pour déclencher un workflow. Expose une <strong>Test URL</strong> (active uniquement quand le workflow est ouvert et en écoute) et une <strong>Production URL</strong> (active quand le workflow est activé). Supporte <code>GET</code>, <code>POST</code>, <code>PUT</code>, <code>DELETE</code>. Les données du body sont accessibles directement via <code>$json</code> (ex : <code>$json.name</code>). Si le webhook est configuré pour renvoyer la requête complète (<em>Output: Full Request</em>), les données sont alors dans <code>$json.body</code>, <code>$json.headers</code>, et <code>$json.query</code>.' },
       { name: 'Edit Fields node', from: 'n8n built-in', detail: 'Permet de créer, modifier ou supprimer des champs dans les données. Anciennement appelé "Set node". Utilise les <strong>expressions n8n</strong> (<code>{{ }}</code>) pour accéder dynamiquement aux données des nodes précédents. Idéal pour préparer les données avant de les envoyer à un service.' },
       { name: 'Slack node', from: 'n8n integration', detail: 'Envoie des messages, réagit, crée des channels, ou lit des conversations Slack. Nécessite un credential OAuth configuré dans l\'instance. Supporte le <strong>Block Kit</strong> pour des messages riches et les <em>threads</em> pour les réponses contextuelles.' },
       { name: 'Connections', from: 'n8n concept', detail: 'Les liens entre les nodes définissent le flux de données. Les données sortantes d\'un node deviennent les données entrantes du suivant, accessibles via <code>$json</code>. Un node peut avoir plusieurs sorties (ex : IF node) et plusieurs entrées.' },
-      { name: 'Workflow activation', from: 'n8n concept', detail: 'Un workflow inactif ne s\'exécute que manuellement ou via la Test URL. L\'<strong>activation</strong> (toggle orange) permet l\'exécution automatique via les triggers : Webhook Production URL, Schedule Trigger, Slack Trigger, etc. Sans activation, les triggers ne se déclenchent pas.' }
+      { name: 'Workflow activation', from: 'n8n concept', detail: 'Un workflow inactif ne s\'exécute que manuellement ou via la Test URL. L\'<strong>activation</strong> (toggle orange) permet l\'exécution automatique via les triggers : Webhook Production URL, Schedule Trigger, Slack Trigger, etc. Sans activation, les triggers ne se déclenchent pas.' },
+      { name: 'Credentials', from: 'n8n concept', detail: 'Les <strong>credentials</strong> stockent les clés d\'API et tokens d\'authentification de manière sécurisée. Vous les trouverez dans <em>Settings → Credentials</em>. Sur l\'instance du hackathon, les credentials Slack, Notion, GitHub et Anthropic sont <strong>déjà pré-configurés</strong> — il suffit de les sélectionner dans les nodes.' }
     ],
     shared: [
       { concept: 'Webhook', targets: ['02', '03', '05'] },
@@ -79,8 +80,8 @@ const EXERCISES = [
     concepts: 'Edit Fields, expressions, Notion node, data mapping, JSON structure, formulaire webhook',
     prereqs: ['01'],
     insights: [
-      '<strong>Les expressions <code>{{ }}</code> sont le ciment entre vos nodes.</strong> — Sans elles, chaque node serait un îlot isolé. Avec <code>{{ $json.body.email }}</code>, vous tissez un fil invisible entre le Webhook et le Notion node. Astuce : cliquez sur l\'icône engrenage d\'un champ pour basculer entre mode fixe et mode expression.',
-      '<strong>Attention à la structure de <code>$json</code> !</strong> — Sur un Webhook, vos données sont dans <code>$json.body</code>, pas dans <code>$json</code> directement. Après un Edit Fields, elles sont directement dans <code>$json</code>. Cette différence est la source d\'erreur #1 chez les débutants. <strong>Conseil :</strong> vérifiez toujours l\'onglet <em>Output</em> d\'un node avant de référencer ses données.',
+      '<strong>Les expressions <code>{{ }}</code> sont le ciment entre vos nodes.</strong> — Sans elles, chaque node serait un îlot isolé. Avec <code>{{ $json.email }}</code>, vous tissez un fil invisible entre le Webhook et le Notion node. Astuce : cliquez sur l\'icône engrenage d\'un champ pour basculer entre mode fixe et mode expression.',
+      '<strong>Attention à la structure de <code>$json</code> !</strong> — Par défaut, un Webhook place les champs du body directement dans <code>$json</code> (ex : <code>$json.email</code>). <em>Attention :</em> si le webhook est configuré en mode <strong>Output: Full Request</strong>, les données sont alors dans <code>$json.body</code>. Après un Edit Fields, les champs produits sont toujours directement dans <code>$json</code>. <strong>Conseil :</strong> vérifiez toujours l\'onglet <em>Output</em> d\'un node avant de référencer ses données.',
       '<strong>Notion = base de données structurée gratuite.</strong> — Contrairement à un Google Sheet, une base Notion a des types de colonnes stricts (texte, email, URL, select...). Le mapping entre vos données et ces colonnes vous force à penser la structure — c\'est un bon réflexe d\'ingénierie des données.'
     ],
     steps: [
@@ -89,8 +90,8 @@ const EXERCISES = [
         expected: 'Le node Webhook est prêt. La Test URL est disponible pour les tests.'
       },
       {
-        instruction: 'Ajoutez un node <strong>Edit Fields</strong> connecté au Webhook. Configurez trois champs : <code>contactName</code> = <code>{{ $json.body.name }}</code>, <code>contactEmail</code> = <code>{{ $json.body.email }}</code>, <code>contactMessage</code> = <code>{{ $json.body.message }}</code>. Cela normalise les noms de champs.',
-        expected: 'Le node Edit Fields affiche trois champs mappés. Les expressions font référence aux données du body du webhook.'
+        instruction: 'Ajoutez un node <strong>Edit Fields</strong> connecté au Webhook. Configurez trois champs : <code>contactName</code> = <code>{{ $json.name }}</code>, <code>contactEmail</code> = <code>{{ $json.email }}</code>, <code>contactMessage</code> = <code>{{ $json.message }}</code>. Cela normalise les noms de champs.',
+        expected: 'Le node Edit Fields affiche trois champs mappés. Les expressions font référence aux données du webhook.'
       },
       {
         instruction: 'Testez le webhook avec la commande curl ci-dessous. Inspectez le panneau <strong>Output</strong> du Edit Fields pour vérifier que les données sont bien transformées.',
@@ -116,7 +117,7 @@ const EXERCISES = [
     ],
     apis: [
       { name: 'Notion node', from: 'n8n integration', detail: 'Interagit avec l\'API Notion : créer des pages, lire des bases de données, mettre à jour des propriétés. Le mapping des propriétés doit respecter les <strong>types de colonnes</strong> de la base (title, rich_text, email, date, select, etc.). Utilise un credential OAuth ou une Internal Integration.' },
-      { name: 'Expressions n8n', from: 'n8n concept', detail: 'Syntaxe <code>{{ }}</code> permettant d\'injecter dynamiquement des valeurs. Accès au node précédent via <code>$json</code>, à des nodes spécifiques via <code>$node["nom"].json</code>, à la date via <code>$now</code>, et aux métadonnées d\'exécution via <code>$execution</code>. Les expressions supportent le JavaScript complet.' },
+      { name: 'Expressions n8n', from: 'n8n concept', detail: 'Syntaxe <code>{{ }}</code> permettant d\'injecter dynamiquement des valeurs. Accès au node précédent via <code>$json</code>, à des nodes spécifiques via <code>$(\'Node Name\').item.json</code>, à la date via <code>$now</code>, et aux métadonnées d\'exécution via <code>$execution</code>. Les expressions supportent le JavaScript complet.' },
       { name: 'Respond to Webhook', from: 'n8n built-in', detail: 'Permet de personnaliser la réponse HTTP renvoyée à l\'appelant du webhook. Sans ce node, le webhook renvoie un simple <code>{"message": "Workflow was started"}</code>. Avec lui, vous contrôlez le status code, les headers, et le body de la réponse.' },
       { name: 'Data mapping', from: 'n8n concept', detail: 'Le processus de faire correspondre les champs de vos données aux champs attendus par un service. Essentiel avec Notion, Airtable, ou tout service avec un schéma strict. L\'onglet <strong>Input/Output</strong> de chaque node est votre meilleur outil de débogage.' }
     ],
@@ -152,13 +153,13 @@ const EXERCISES = [
         expected: 'Le trigger écoute deux événements. Vous pouvez voir les différents payloads attendus dans la documentation GitHub.'
       },
       {
-        instruction: 'Ajoutez un node <strong>IF</strong> connecté au trigger. Configurez la condition : <code>{{ $json.body.action }}</code> est égal à <code>opened</code> (pour ne notifier que les nouvelles PR, pas les updates ou closes).',
+        instruction: 'Ajoutez un node <strong>IF</strong> connecté au trigger. Configurez la condition : <code>{{ $json.action }}</code> est égal à <code>opened</code> (pour ne notifier que les nouvelles PR, pas les updates ou closes).',
         expected: 'Le IF node crée deux branches : <em>true</em> (nouvelle PR ouverte) et <em>false</em> (autres actions qu\'on ignore).'
       },
       {
         instruction: 'Sur la branche <strong>true</strong>, ajoutez un node <strong>Edit Fields</strong> pour préparer le message. Créez un champ <code>slackMessage</code> avec le template ci-dessous.',
         expected: 'Le Edit Fields produit un message Slack formaté avec le titre de la PR, l\'auteur, et un lien cliquable.',
-        copyable: '🔀 *Nouvelle PR* : <{{ $json.body.pull_request.html_url }}|{{ $json.body.pull_request.title }}>\n👤 Auteur : {{ $json.body.pull_request.user.login }}\n📦 Repo : {{ $json.body.repository.full_name }}\n📝 {{ $json.body.pull_request.body ? $json.body.pull_request.body.substring(0, 200) + "..." : "Pas de description" }}'
+        copyable: '🔀 *Nouvelle PR* : <{{ $json.pull_request.html_url }}|{{ $json.pull_request.title }}>\n👤 Auteur : {{ $json.pull_request.user.login }}\n📦 Repo : {{ $json.repository.full_name }}\n📝 {{ $json.pull_request.body ? $json.pull_request.body.substring(0, 200) + "..." : "Pas de description" }}'
       },
       {
         instruction: 'Connectez le Edit Fields à un node <strong>Slack</strong> (Send a Message). Choisissez votre channel d\'équipe et utilisez <code>{{ $json.slackMessage }}</code> comme texte du message.',
@@ -238,7 +239,7 @@ const EXERCISES = [
       { name: 'Schedule Trigger', from: 'n8n built-in', detail: 'Déclenche un workflow selon un planning. Supporte les intervalles simples (toutes les heures) et les expressions <strong>cron</strong> pour un contrôle précis. Format cron : <code>minute heure jour-du-mois mois jour-de-la-semaine</code>. Exemples : <code>0 9 * * 1-5</code> = 9h en semaine, <code>*/15 * * * *</code> = toutes les 15 min.' },
       { name: 'HTTP Request node', from: 'n8n built-in', detail: 'Effectue des appels HTTP vers n\'importe quelle API REST. Supporte <code>GET</code>, <code>POST</code>, <code>PUT</code>, <code>DELETE</code>, les headers personnalisés, l\'authentification (Bearer, Basic, OAuth), et les expressions dans l\'URL et le body. Gère automatiquement le parsing JSON des réponses.' },
       { name: 'Code node', from: 'n8n built-in', detail: 'Exécute du <strong>JavaScript</strong> ou <strong>Python</strong> dans le workflow. Accès aux données via <code>$input.all()</code> (tous les items) ou <code>$input.first()</code> (premier item). Doit retourner un tableau d\'objets <code>[{ json: {...} }]</code>. Environnement sandboxé — pas d\'accès filesystem ou réseau.' },
-      { name: 'Merge node', from: 'n8n built-in', detail: 'Combine les données de plusieurs branches en une seule sortie. Mode <em>Append</em> : concatène les items. Mode <em>Keep Key Matches</em> : jointure sur un champ commun. Mode <em>Multiplex</em> : produit cartésien. Essentiel pour les workflows en parallèle.' },
+      { name: 'Merge node', from: 'n8n built-in', detail: 'Combine les données de plusieurs branches en une seule sortie. Mode <em>Append</em> : concatène les items. Mode <em>Combine &gt; Matching Fields</em> : jointure sur un champ commun. Mode <em>Combine &gt; All Possible Combinations</em> : produit cartésien. Essentiel pour les workflows en parallèle.' },
       { name: 'Exécution parallèle', from: 'n8n concept', detail: 'Quand plusieurs nodes sont connectés à la sortie d\'un même node, n8n les exécute <strong>en parallèle</strong>. Le Merge node attend que toutes les branches soient terminées avant de s\'exécuter. C\'est un pattern naturel pour agréger des données de sources multiples.' }
     ],
     shared: [
@@ -269,11 +270,11 @@ const EXERCISES = [
         expected: 'Le node Webhook est prêt à recevoir des tickets structurés en JSON.'
       },
       {
-        instruction: 'Ajoutez un node <strong>Switch</strong> connecté au Webhook. Configurez le routing sur le champ <code>{{ $json.body.type }}</code>. Créez trois règles : <code>bug</code> → sortie 0, <code>feature</code> → sortie 1, <code>urgent</code> → sortie 2. Activez aussi la sortie <em>Fallback</em> pour les types non reconnus.',
+        instruction: 'Ajoutez un node <strong>Switch</strong> connecté au Webhook. Configurez le routing sur le champ <code>{{ $json.type }}</code>. Créez trois règles : <code>bug</code> → sortie 0, <code>feature</code> → sortie 1, <code>urgent</code> → sortie 2. Activez aussi la sortie <em>Fallback</em> pour les types non reconnus.',
         expected: 'Le Switch node affiche 4 sorties : 3 nommées (bug, feature, urgent) + 1 fallback. Renommez-les pour plus de clarté.'
       },
       {
-        instruction: 'Sur la sortie <strong>bug</strong>, ajoutez un node <strong>GitHub</strong> (action : <em>Create Issue</em>). Configurez-le pour créer une issue avec le titre <code>🐛 {{ $json.body.title }}</code> et le body <code>Reporté par : {{ $json.body.reporter }}\\n\\n{{ $json.body.description }}</code>. Sélectionnez un repository de test.',
+        instruction: 'Sur la sortie <strong>bug</strong>, ajoutez un node <strong>GitHub</strong> (action : <em>Create Issue</em>). Configurez-le pour créer une issue avec le titre <code>🐛 {{ $json.title }}</code> et le body <code>Reporté par : {{ $json.reporter }}\\n\\n{{ $json.description }}</code>. Sélectionnez un repository de test.',
         expected: 'La branche "bug" crée automatiquement une issue GitHub avec le bon formatage.',
         copyable: 'curl -X POST <VOTRE_TEST_URL> \\\n  -H "Content-Type: application/json" \\\n  -d \'{"type": "bug", "title": "Bouton cassé sur la page panier", "description": "Le bouton Valider ne répond pas au clic sur mobile Safari.", "reporter": "marie.dupont"}\''
       },
@@ -283,12 +284,12 @@ const EXERCISES = [
         copyable: 'curl -X POST <VOTRE_TEST_URL> \\\n  -H "Content-Type: application/json" \\\n  -d \'{"type": "feature", "title": "Dark mode pour le dashboard", "description": "Permettre aux utilisateurs de basculer en mode sombre.", "reporter": "jean.martin"}\''
       },
       {
-        instruction: 'Sur la sortie <strong>urgent</strong>, ajoutez un node <strong>Slack</strong> (Send Message). Configurez un message d\'alerte avec mention : <code>🚨 *TICKET URGENT* 🚨\\n*{{ $json.body.title }}*\\nReporté par : {{ $json.body.reporter }}\\n{{ $json.body.description }}\\n\\n<!channel> Merci de prendre en charge rapidement.</code>',
+        instruction: 'Sur la sortie <strong>urgent</strong>, ajoutez un node <strong>Slack</strong> (Send Message). Configurez un message d\'alerte avec mention : <code>🚨 *TICKET URGENT* 🚨\\n*{{ $json.title }}*\\nReporté par : {{ $json.reporter }}\\n{{ $json.description }}\\n\\n<!channel> Merci de prendre en charge rapidement.</code>',
         expected: 'La branche "urgent" envoie une alerte Slack avec @channel pour notifier toute l\'équipe.',
         copyable: 'curl -X POST <VOTRE_TEST_URL> \\\n  -H "Content-Type: application/json" \\\n  -d \'{"type": "urgent", "title": "API de paiement down", "description": "Les paiements échouent depuis 10 minutes. Stripe renvoie des 500.", "reporter": "ops-bot"}\''
       },
       {
-        instruction: 'Sur la sortie <strong>fallback</strong>, ajoutez un node <strong>Slack</strong> qui envoie un message de warning : <code>⚠️ Ticket non routé (type inconnu : {{ $json.body.type }}). Titre : {{ $json.body.title }}</code>. Cela garantit qu\'aucun ticket n\'est silencieusement perdu.',
+        instruction: 'Sur la sortie <strong>fallback</strong>, ajoutez un node <strong>Slack</strong> qui envoie un message de warning : <code>⚠️ Ticket non routé (type inconnu : {{ $json.type }}). Titre : {{ $json.title }}</code>. Cela garantit qu\'aucun ticket n\'est silencieusement perdu.',
         expected: 'Tout ticket avec un type non reconnu génère un avertissement dans Slack plutôt que d\'être ignoré.'
       },
       {
@@ -296,7 +297,7 @@ const EXERCISES = [
         expected: 'Les bugs créent des issues GitHub, les features créent des pages Notion, les urgents alertent Slack, et les types inconnus génèrent un warning.'
       },
       {
-        instruction: 'Ajoutez un node <strong>Respond to Webhook</strong> à la fin de chaque branche pour confirmer le routage : <code>{{ JSON.stringify({ routed: true, destination: "github|notion|slack|fallback", type: $json.body.type }) }}</code>.',
+        instruction: 'Ajoutez un node <strong>Respond to Webhook</strong> à la fin de chaque branche pour confirmer le routage : <code>{{ JSON.stringify({ routed: true, destination: "github|notion|slack|fallback", type: $json.type }) }}</code>.',
         expected: 'Chaque appel au webhook reçoit une réponse JSON confirmant où le ticket a été routé. Le workflow est complet et robuste.'
       }
     ],
@@ -319,12 +320,12 @@ const EXERCISES = [
     layer: 'ai',
     done: true,
     jourJ: false,
-    concepts: 'AI Agent node, LLM configuration, Claude, tools, Window Buffer Memory, Slack bot, conversational agent',
+    concepts: 'AI Agent node, LLM configuration, Claude, tools, Simple Memory, Slack bot, conversational agent',
     prereqs: ['01'],
     insights: [
       '<strong>Le node AI Agent = un agent complet en une brique.</strong> — LLM + outils + mémoire, c\'est l\'équivalent visuel de <code>createReactAgent()</code> en LangGraph. Pas besoin de coder un <code>AgentExecutor</code> — n8n orchestre la boucle réflexion → action → observation pour vous. C\'est du no-code, mais c\'est un <em>vrai</em> agent.',
       '<strong>Les "tools" sont des nodes connectés au AI Agent.</strong> — Chaque node-outil devient une capacité que l\'IA peut invoquer — exactement comme <code>bindTools()</code> en LangChain. Un <code>Calculator</code> connecté = l\'agent sait calculer. Un <code>HTTP Request</code> connecté = l\'agent peut appeler des API. Le LLM <em>décide lui-même</em> quand utiliser chaque outil.',
-      '<strong>La mémoire transforme un bot en assistant.</strong> — Sans <code>Window Buffer Memory</code>, chaque message est traité indépendamment. Avec, l\'agent se souvient des échanges précédents. "Quel est le cours du Bitcoin ?" puis "Et en euros ?" fonctionne car l\'agent a le contexte.'
+      '<strong>La mémoire transforme un bot en assistant.</strong> — Sans <code>Simple Memory</code>, chaque message est traité indépendamment. Avec, l\'agent se souvient des échanges précédents. "Quel est le cours du Bitcoin ?" puis "Et en euros ?" fonctionne car l\'agent a le contexte.'
     ],
     steps: [
       {
@@ -336,7 +337,7 @@ const EXERCISES = [
         expected: 'Le node AI Agent est connecté au Slack Trigger. Le message Slack sera transmis au LLM comme requête utilisateur.'
       },
       {
-        instruction: 'Configurez le <strong>LLM</strong> : cliquez sur l\'entrée <em>Chat Model</em> du AI Agent, ajoutez un node <strong>Anthropic Chat Model</strong>. Sélectionnez le credential Anthropic disponible sur l\'instance et choisissez le modèle <code>claude-sonnet-4-20250514</code>.',
+        instruction: 'Configurez le <strong>LLM</strong> : cliquez sur l\'entrée <em>Chat Model</em> du AI Agent, ajoutez un node <strong>Anthropic Chat Model</strong>. Sélectionnez le credential Anthropic disponible sur l\'instance et choisissez le modèle <code>claude-sonnet-4-20250514</code> (ou sélectionnez le dernier modèle Claude Sonnet disponible dans la liste).',
         expected: 'Le node Anthropic Chat Model est connecté à l\'entrée Model du AI Agent. Claude est prêt à répondre.'
       },
       {
@@ -348,7 +349,7 @@ const EXERCISES = [
         expected: 'Deux nodes-outils sont connectés à l\'AI Agent. L\'agent peut maintenant calculer et faire des requêtes HTTP.'
       },
       {
-        instruction: 'Ajoutez de la <strong>mémoire</strong> : connectez un node <strong>Window Buffer Memory</strong> à l\'entrée <em>Memory</em> du AI Agent. Configurez la fenêtre à <code>10</code> messages. Utilisez <code>{{ $json.channel + "_" + $json.user }}</code> comme <em>Session ID</em> pour isoler les conversations par utilisateur et channel.',
+        instruction: 'Ajoutez de la <strong>mémoire</strong> : connectez un node <strong>Simple Memory</strong> à l\'entrée <em>Memory</em> du AI Agent. Configurez la fenêtre à <code>10</code> messages. Utilisez <code>{{ $json.channel + "_" + $json.user }}</code> comme <em>Session ID</em> pour isoler les conversations par utilisateur et channel.',
         expected: 'La mémoire est configurée avec un session ID unique par utilisateur/channel. L\'agent maintiendra le contexte conversationnel.'
       },
       {
@@ -364,7 +365,7 @@ const EXERCISES = [
       { name: 'AI Agent node', from: 'n8n AI', detail: 'Node central de l\'IA dans n8n. Orchestre un LLM avec des outils et une mémoire. Équivalent visuel de <code>createReactAgent()</code> en LangGraph. Gère automatiquement la boucle <strong>réflexion → action → observation</strong>. Supporte les system prompts, les output parsers, et les tools.' },
       { name: 'Anthropic Chat Model', from: 'n8n AI', detail: 'Connecte Claude comme LLM. Supporte les modèles Claude 3.5 Haiku, Claude 4 Sonnet, et Claude 4 Opus. Configuré via un credential avec la clé API Anthropic. Paramètres ajustables : <code>temperature</code>, <code>maxTokens</code>, <code>topP</code>.' },
       { name: 'Tools (Calculator, HTTP Request)', from: 'n8n AI', detail: 'Les nodes connectés à l\'entrée <em>Tools</em> du AI Agent deviennent des capacités invocables par le LLM. Le LLM décide <strong>quand et comment</strong> les utiliser en fonction de la requête. Chaque tool a un <code>name</code> et une <code>description</code> qui guident le LLM.' },
-      { name: 'Window Buffer Memory', from: 'n8n AI', detail: 'Mémoire conversationnelle à fenêtre glissante. Stocke les N derniers messages (humain + IA). Le <strong>Session ID</strong> permet d\'isoler les conversations. Équivalent de <code>BufferWindowMemory</code> en LangChain. Sans mémoire, chaque message est traité comme une conversation nouvelle.' },
+      { name: 'Simple Memory', from: 'n8n AI', detail: 'Mémoire conversationnelle à fenêtre glissante. Stocke les N derniers messages (humain + IA). Le <strong>Session ID</strong> permet d\'isoler les conversations. Équivalent de <code>BufferWindowMemory</code> en LangChain. Sans mémoire, chaque message est traité comme une conversation nouvelle.' },
       { name: 'Slack Trigger', from: 'n8n integration', detail: 'Déclenche le workflow sur des événements Slack : nouveau message, réaction ajoutée, mention, etc. Utilise l\'API Events de Slack via OAuth. Les données incluent <code>text</code>, <code>user</code>, <code>channel</code>, <code>ts</code> (timestamp), et <code>thread_ts</code> (pour les threads).' }
     ],
     shared: [
@@ -399,7 +400,7 @@ const EXERCISES = [
         expected: 'Le Slack Trigger est configuré et écoute le channel dédié aux questions.'
       },
       {
-        instruction: 'Ajoutez un node <strong>AI Agent</strong> connecté au Slack Trigger. Configurez le champ <em>Text</em> avec <code>{{ $json.text }}</code>. Ajoutez un <strong>Anthropic Chat Model</strong> (claude-sonnet-4-20250514) comme LLM.',
+        instruction: 'Ajoutez un node <strong>AI Agent</strong> connecté au Slack Trigger. Configurez le champ <em>Text</em> avec <code>{{ $json.text }}</code>. Ajoutez un <strong>Anthropic Chat Model</strong> (<code>claude-sonnet-4-20250514</code> ou le dernier modèle Claude Sonnet disponible) comme LLM.',
         expected: 'L\'AI Agent est connecté avec Claude comme modèle. Il est prêt à recevoir des questions depuis Slack.'
       },
       {
@@ -412,7 +413,7 @@ const EXERCISES = [
         expected: 'Le tool Notion est connecté au AI Agent. L\'agent peut maintenant chercher dans la base Notion quand on lui pose une question.'
       },
       {
-        instruction: 'Ajoutez une <strong>Window Buffer Memory</strong> (fenêtre de 5 messages, Session ID : <code>{{ $json.channel + "_" + $json.user }}</code>) pour permettre les questions de suivi.',
+        instruction: 'Ajoutez une <strong>Simple Memory</strong> (fenêtre de 5 messages, Session ID : <code>{{ $json.channel + "_" + $json.user }}</code>) pour permettre les questions de suivi.',
         expected: 'La mémoire est configurée. L\'utilisateur peut poser une question, puis demander des précisions sans répéter le contexte.'
       },
       {
